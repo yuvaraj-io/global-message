@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  background: #080b12;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(77, 214, 214, 0.08), transparent 30%),
+    radial-gradient(circle at 85% 10%, rgba(255, 107, 154, 0.08), transparent 28%),
+    #080b12;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #253044 #080b12;
+}
+
+@layer components {
+  .panel {
+    @apply border border-white/10 bg-space-900/80 shadow-2xl shadow-black/20 backdrop-blur;
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-white/10 bg-space-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-space-cyan/70 focus:ring-2 focus:ring-space-cyan/10;
+  }
+
+  .button-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-space-cyan px-4 py-2.5 text-sm font-semibold text-space-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .button-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-white/20 hover:bg-white/5;
+  }
+}
