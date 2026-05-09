@@ -1,19 +1,22 @@
-import { useEffect, useState } from "react";
-import { FiSearch } from "react-icons/fi";
+import { useEffect } from "react";
+import { FiMessageSquare, FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { UserAvatar } from "../components/UserAvatar";
+import { useSearchState } from "../context/SearchContext";
 import { useDebounce } from "../hooks/useDebounce";
 import { api } from "../services/api";
-import { User } from "../types";
 
 export const SearchPage = () => {
-  const [query, setQuery] = useState("");
-  const [users, setUsers] = useState<User[]>([]);
+  const { query, setQuery, users, setUsers } = useSearchState();
   const debounced = useDebounce(query, 250);
 
   useEffect(() => {
+    if (!debounced.trim()) {
+      setUsers([]);
+      return;
+    }
     api.get("/users/search", { params: { q: debounced } }).then((res) => setUsers(res.data.users));
-  }, [debounced]);
+  }, [debounced, setUsers]);
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -28,14 +31,25 @@ export const SearchPage = () => {
       </div>
       <div className="mt-4 space-y-3">
         {users.map((user) => (
-          <Link key={user.id} to={`/profile/${user.username}`} className="panel flex items-center gap-3 rounded-xl p-4 transition hover:border-white/20">
-            <UserAvatar user={user} />
-            <div>
-              <div className="font-semibold text-white">@{user.username}</div>
-              <p className="line-clamp-1 text-sm text-slate-500">{user.bio}</p>
-            </div>
-          </Link>
+          <div key={user.id} className="panel flex items-center gap-3 rounded-xl p-4 transition hover:border-white/20">
+            <Link to={`/profile/${user.username}`} className="flex min-w-0 flex-1 items-center gap-3">
+              <UserAvatar user={user} />
+              <div className="min-w-0">
+                <div className="font-semibold text-white">@{user.username}</div>
+                <p className="line-clamp-1 text-sm text-slate-500">{user.bio}</p>
+              </div>
+            </Link>
+            <Link className="button-ghost shrink-0 px-3 py-2" to={`/messages/${user.username}`} aria-label={`Message ${user.username}`}>
+              <FiMessageSquare />
+              <span className="hidden sm:inline">Message</span>
+            </Link>
+          </div>
         ))}
+        {query.trim() && !users.length && (
+          <div className="panel rounded-xl p-8 text-center text-sm text-slate-500">
+            No matching profiles found.
+          </div>
+        )}
       </div>
     </div>
   );

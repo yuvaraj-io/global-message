@@ -17,6 +17,7 @@ export const App = () => (
           <Route index element={<HomePage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/messages" element={<MessagesPage />} />
+          <Route path="/messages/:username" element={<MessagesPage />} />
           <Route path="/profile/:username" element={<ProfilePage />} />
         </Route>
       </Route>

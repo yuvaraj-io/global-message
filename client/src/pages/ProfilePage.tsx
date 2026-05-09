@@ -1,6 +1,6 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { FiCalendar, FiCamera, FiEdit2, FiMessageSquare, FiRadio, FiSave, FiTrash2, FiX } from "react-icons/fi";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { LoadingState } from "../components/LoadingState";
 import { PostCard } from "../components/PostCard";
 import { UserAvatar } from "../components/UserAvatar";
@@ -129,6 +129,12 @@ export const ProfilePage = () => {
                   {editing ? <FiX /> : <FiEdit2 />}
                   {editing ? "Cancel" : "Edit profile"}
                 </button>
+              )}
+              {!isMe && (
+                <Link className="button-primary py-2" to={`/messages/${profile.user.username}`}>
+                  <FiMessageSquare />
+                  Message
+                </Link>
               )}
             </div>
           </div>

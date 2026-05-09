@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { FiCheckCircle, FiSend } from "react-icons/fi";
+import { useNavigate, useParams } from "react-router-dom";
 import { UserAvatar } from "../components/UserAvatar";
 import { useAuth } from "../context/AuthContext";
 import { useSocket } from "../context/SocketContext";
@@ -8,6 +9,8 @@ import { Conversation, Message, User } from "../types";
 import { timeAgo } from "../utils/time";
 
 export const MessagesPage = () => {
+  const { username } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { socket, online } = useSocket();
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -18,10 +21,23 @@ export const MessagesPage = () => {
 
   useEffect(() => {
     api.get("/messages/conversations").then((res) => {
-      setConversations(res.data.conversations);
-      setActive(res.data.conversations[0]?.user || null);
+      const nextConversations: Conversation[] = res.data.conversations;
+      setConversations(nextConversations);
+      if (!username) setActive(nextConversations[0]?.user || null);
     });
-  }, []);
+  }, [username]);
+
+  useEffect(() => {
+    if (!username) return;
+    api.get(`/messages/${username}`).then((res) => {
+      setActive(res.data.user);
+      setMessages(res.data.messages);
+      setConversations((current) => {
+        if (current.some((conversation) => conversation.user.id === res.data.user.id)) return current;
+        return current;
+      });
+    });
+  }, [username]);
 
   useEffect(() => {
     if (!active) return;
@@ -72,7 +88,14 @@ export const MessagesPage = () => {
         <h1 className="px-2 py-3 text-2xl font-black text-white">Messages</h1>
         <div className="space-y-2">
           {conversations.map((conversation) => (
-            <button key={conversation.user.id} onClick={() => setActive(conversation.user)} className={`flex w-full items-center gap-3 rounded-lg p-3 text-left transition ${active?.id === conversation.user.id ? "bg-white/10" : "hover:bg-white/5"}`}>
+            <button
+              key={conversation.user.id}
+              onClick={() => {
+                setActive(conversation.user);
+                navigate(`/messages/${conversation.user.username}`);
+              }}
+              className={`flex w-full items-center gap-3 rounded-lg p-3 text-left transition ${active?.id === conversation.user.id ? "bg-white/10" : "hover:bg-white/5"}`}
+            >
               <UserAvatar user={conversation.user} online={online[conversation.user.id]} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between">
@@ -83,7 +106,7 @@ export const MessagesPage = () => {
               </div>
             </button>
           ))}
-          {!conversations.length && <p className="px-3 py-8 text-sm text-slate-500">Open a profile from search to start a conversation soon.</p>}
+          {!conversations.length && <p className="px-3 py-8 text-sm text-slate-500">Search a profile and tap Message to start a conversation.</p>}
         </div>
       </aside>
 
