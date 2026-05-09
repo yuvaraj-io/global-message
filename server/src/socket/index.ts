@@ -44,12 +44,12 @@ export const createSocketServer = (server: HttpServer) => {
       }
     });
 
-    socket.on("reply:create", async ({ postId, parentReplyId, content }, ack) => {
+    socket.on("reply:create", async ({ postId, parentReplyId, content, clientId }, ack) => {
       try {
         const reply = await Reply.create({ postId, parentReplyId: parentReplyId || null, content, userId: user.id });
         const post = await Post.findByIdAndUpdate(postId, { $inc: { repliesCount: 1 } }, { new: true }).populate("userId");
         await reply.populate("userId");
-        const payload = serializeReply(reply);
+        const payload = { ...serializeReply(reply), clientId };
         io.emit("reply:new", { postId, reply: payload, post: post ? serializePost(post) : null });
         io.emit("profile:update", { username: user.username, type: "reply", item: payload });
         ack?.({ ok: true, reply: payload });

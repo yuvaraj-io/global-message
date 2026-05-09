@@ -19,6 +19,7 @@ export type Post = {
 
 export type Reply = {
   id: string;
+  clientId?: string;
   content: string;
   postId: string;
   parentReplyId: string | null;

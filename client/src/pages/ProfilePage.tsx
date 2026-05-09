@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
-import { FiCalendar, FiMessageSquare, FiRadio } from "react-icons/fi";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { FiCalendar, FiCamera, FiEdit2, FiMessageSquare, FiRadio, FiSave, FiTrash2, FiX } from "react-icons/fi";
 import { useParams } from "react-router-dom";
 import { LoadingState } from "../components/LoadingState";
 import { PostCard } from "../components/PostCard";
 import { UserAvatar } from "../components/UserAvatar";
+import { useAuth } from "../context/AuthContext";
 import { useSocket } from "../context/SocketContext";
-import { api } from "../services/api";
+import { useUI } from "../context/UIContext";
+import { api, getErrorMessage } from "../services/api";
 import { Discussion, Post, Reply, User } from "../types";
 import { fullDate, timeAgo } from "../utils/time";
 
@@ -20,11 +22,21 @@ export const ProfilePage = () => {
   const { username } = useParams();
   const [profile, setProfile] = useState<ProfilePayload | null>(null);
   const [tab, setTab] = useState("posts");
+  const [editing, setEditing] = useState(false);
+  const [bio, setBio] = useState("");
+  const [avatar, setAvatar] = useState("");
+  const [saving, setSaving] = useState(false);
   const { socket } = useSocket();
+  const { user, updateUser } = useAuth();
+  const { confirm, showSnackbar } = useUI();
 
   useEffect(() => {
     setProfile(null);
-    api.get(`/users/${username}`).then((res) => setProfile(res.data));
+    api.get(`/users/${username}`).then((res) => {
+      setProfile(res.data);
+      setBio(res.data.user.bio);
+      setAvatar(res.data.user.avatar);
+    });
   }, [username]);
 
   useEffect(() => {
@@ -47,6 +59,60 @@ export const ProfilePage = () => {
   if (!profile) return <LoadingState label="Loading profile" />;
 
   const tabs = ["posts", "replies", "discussions", "media"];
+  const isMe = user?.id === profile.user.id;
+
+  const selectAvatar = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      showSnackbar("Please choose an image file.", "error");
+      return;
+    }
+    if (file.size > 1_500_000) {
+      showSnackbar("Please choose an image under 1.5 MB.", "error");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => setAvatar(String(reader.result));
+    reader.readAsDataURL(file);
+  };
+
+  const saveProfile = async (event: FormEvent) => {
+    event.preventDefault();
+    setSaving(true);
+    try {
+      const res = await api.patch("/users/me", { bio, avatar });
+      setProfile((current) => (current ? { ...current, user: res.data.user } : current));
+      updateUser(res.data.user);
+      setEditing(false);
+      showSnackbar("Profile updated successfully.", "success");
+    } catch (error) {
+      showSnackbar(getErrorMessage(error), "error");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteReplyFromProfile = async (reply: Reply) => {
+    const accepted = await confirm({
+      title: "Delete comment?",
+      message: "This comment and any nested replies under it will be removed.",
+      confirmLabel: "Delete comment",
+      tone: "danger"
+    });
+    if (!accepted) return;
+    try {
+      const res = await api.delete(`/posts/${reply.postId}/replies/${reply.id}`);
+      const deletedIds: string[] = res.data.deletedIds || [reply.id];
+      setProfile((current) =>
+        current ? { ...current, replies: current.replies.filter((item) => !deletedIds.includes(item.id)) } : current
+      );
+      showSnackbar("Comment deleted successfully.", "success");
+    } catch (error) {
+      showSnackbar(getErrorMessage(error), "error");
+    }
+  };
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -55,13 +121,45 @@ export const ProfilePage = () => {
         <div className="px-5 pb-5">
           <div className="-mt-10 flex flex-wrap items-end justify-between gap-4">
             <UserAvatar user={profile.user} size="lg" />
-            <div className="flex gap-4 text-sm text-slate-400">
+            <div className="flex flex-wrap items-center gap-3 text-sm text-slate-400">
               <span>{profile.user.followersCount} followers</span>
               <span>{profile.user.followingCount} following</span>
+              {isMe && (
+                <button className="button-ghost py-2" onClick={() => setEditing((value) => !value)}>
+                  {editing ? <FiX /> : <FiEdit2 />}
+                  {editing ? "Cancel" : "Edit profile"}
+                </button>
+              )}
             </div>
           </div>
-          <h1 className="mt-4 text-3xl font-black text-white">@{profile.user.username}</h1>
-          <p className="mt-2 max-w-xl text-slate-300">{profile.user.bio}</p>
+          {editing ? (
+            <form onSubmit={saveProfile} className="mt-5 space-y-4 rounded-xl border border-white/10 bg-space-950/60 p-4">
+              <div className="flex flex-wrap items-center gap-4">
+                <img className="h-20 w-20 rounded-full border border-white/10 object-cover" src={avatar} alt={profile.user.username} />
+                <label className="button-ghost cursor-pointer py-2">
+                  <FiCamera />
+                  Upload photo
+                  <input className="hidden" type="file" accept="image/*" onChange={selectAvatar} />
+                </label>
+              </div>
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">Bio</span>
+                <textarea className="input min-h-24 resize-none" value={bio} maxLength={160} onChange={(event) => setBio(event.target.value)} />
+              </label>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-500">{bio.length}/160</span>
+                <button className="button-primary" disabled={saving}>
+                  <FiSave />
+                  Save profile
+                </button>
+              </div>
+            </form>
+          ) : (
+            <>
+              <h1 className="mt-4 text-3xl font-black text-white">@{profile.user.username}</h1>
+              <p className="mt-2 max-w-xl text-slate-300">{profile.user.bio}</p>
+            </>
+          )}
           <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-500">
             <span className="inline-flex items-center gap-2">
               <FiCalendar /> Joined {fullDate(profile.user.createdAt)}
@@ -82,13 +180,26 @@ export const ProfilePage = () => {
       </div>
 
       <div className="mt-4 space-y-4">
-        {tab === "posts" && profile.posts.map((post) => <PostCard key={post.id} post={post} />)}
+        {tab === "posts" &&
+          profile.posts.map((post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              onDelete={(postId) => setProfile((current) => (current ? { ...current, posts: current.posts.filter((item) => item.id !== postId) } : current))}
+            />
+          ))}
         {tab === "replies" &&
           profile.replies.map((reply) => (
             <div key={reply.id} className="panel rounded-xl p-4">
               <div className="flex items-center gap-2 text-sm text-slate-500">
                 <FiMessageSquare />
                 replied {timeAgo(reply.createdAt)}
+                {isMe && (
+                  <button className="ml-auto inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-slate-500 transition hover:bg-red-500/10 hover:text-red-200" onClick={() => deleteReplyFromProfile(reply)}>
+                    <FiTrash2 />
+                    Delete
+                  </button>
+                )}
               </div>
               <p className="mt-2 text-slate-200">{reply.content}</p>
             </div>

@@ -38,3 +38,20 @@ export const getProfile = asyncHandler(async (req, res) => {
     activity: [...posts, ...replies].sort((a, b) => +b.createdAt - +a.createdAt).slice(0, 10)
   });
 });
+
+export const updateProfile = asyncHandler(async (req, res) => {
+  const bio = String(req.body.bio || "").trim().slice(0, 160);
+  const avatar = String(req.body.avatar || "").trim();
+
+  if (avatar && !avatar.startsWith("data:image/") && !avatar.startsWith("http")) {
+    return res.status(400).json({ message: "Avatar must be an image upload or URL" });
+  }
+
+  const update: { bio?: string; avatar?: string } = { bio };
+  if (avatar) update.avatar = avatar;
+
+  const user = await User.findByIdAndUpdate(req.user!.id, update, { new: true, runValidators: true });
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  res.json({ user: serializeUser(user) });
+});

@@ -62,7 +62,11 @@ export const HomePage = () => {
       </header>
 
       <PostComposer />
-      {loading ? <LoadingState label="Loading feed" /> : posts.map((post) => <PostCard key={post.id} post={post} />)}
+      {loading ? (
+        <LoadingState label="Loading feed" />
+      ) : (
+        posts.map((post) => <PostCard key={post.id} post={post} onDelete={(postId) => setPosts((current) => current.filter((item) => item.id !== postId))} />)
+      )}
       <div ref={sentinelRef}>{loadingMore && <LoadingState label="Loading more" />}</div>
     </div>
   );

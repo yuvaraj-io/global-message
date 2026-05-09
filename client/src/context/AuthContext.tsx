@@ -8,6 +8,7 @@ type AuthContextValue = {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string) => Promise<void>;
+  updateUser: (user: User) => void;
   logout: () => void;
 };
 
@@ -61,6 +62,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
           throw new Error(getErrorMessage(error));
         }
       },
+      updateUser: (nextUser) => setUser(nextUser),
       logout: () => {
         localStorage.removeItem("global-space-token");
         setToken(null);
