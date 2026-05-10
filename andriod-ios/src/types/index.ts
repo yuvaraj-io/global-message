@@ -34,6 +34,8 @@ export type Message = {
   content: string;
   seen: boolean;
   createdAt: string;
+  sender?: User | null;
+  receiver?: User | null;
 };
 
 export type Conversation = {

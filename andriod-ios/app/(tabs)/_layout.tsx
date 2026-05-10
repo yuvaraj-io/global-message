@@ -2,10 +2,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 import { useAuth } from "@/src/context/AuthContext";
+import { useNotifications } from "@/src/context/NotificationContext";
 import { colors } from "@/src/utils/theme";
 
 export default function TabLayout() {
   const { user, loading } = useAuth();
+  const { unreadCount, unreadMessages } = useNotifications();
+  const unreadMessageCount = Object.values(unreadMessages).reduce((total, count) => total + count, 0);
 
   if (loading) {
     return (
@@ -43,7 +46,18 @@ export default function TabLayout() {
         name="messages"
         options={{
           title: "Messages",
-          tabBarIcon: ({ color }) => <Ionicons size={24} name="chatbubbles" color={color} />
+          tabBarIcon: ({ color }) => <Ionicons size={24} name="chatbubbles" color={color} />,
+          tabBarBadge: unreadMessageCount || undefined,
+          tabBarBadgeStyle: { backgroundColor: colors.lime, color: colors.bg }
+        }}
+      />
+      <Tabs.Screen
+        name="notifications"
+        options={{
+          title: "Alerts",
+          tabBarIcon: ({ color }) => <Ionicons size={24} name="notifications" color={color} />,
+          tabBarBadge: unreadCount || undefined,
+          tabBarBadgeStyle: { backgroundColor: colors.rose, color: colors.text }
         }}
       />
       <Tabs.Screen
@@ -53,6 +67,8 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Ionicons size={24} name="person" color={color} />
         }}
       />
+      <Tabs.Screen name="profile/[username]" options={{ href: null }} />
+      <Tabs.Screen name="messages/[username]" options={{ href: null }} />
       <Tabs.Screen name="explore" options={{ href: null }} />
     </Tabs>
   );

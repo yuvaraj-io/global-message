@@ -6,6 +6,7 @@ import { Avatar } from "@/src/components/Avatar";
 import { Header } from "@/src/components/Header";
 import { Screen } from "@/src/components/Screen";
 import { useAuth } from "@/src/context/AuthContext";
+import { useNotifications } from "@/src/context/NotificationContext";
 import { useSocket } from "@/src/context/SocketContext";
 import { apiRequest } from "@/src/services/api";
 import { Conversation, Message, User } from "@/src/types";
@@ -16,6 +17,7 @@ export default function MessagesScreen() {
   const { username } = useLocalSearchParams<{ username?: string }>();
   const { user } = useAuth();
   const { socket, online } = useSocket();
+  const { unreadMessages, clearMessageUnread } = useNotifications();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [active, setActive] = useState<User | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -25,7 +27,10 @@ export default function MessagesScreen() {
   useEffect(() => {
     apiRequest<{ conversations: Conversation[] }>("/messages/conversations").then((res) => {
       setConversations(res.conversations);
-      if (!username) setActive(res.conversations[0]?.user || null);
+      if (!username) {
+        setActive(null);
+        setMessages([]);
+      }
     });
   }, [username]);
 
@@ -34,12 +39,16 @@ export default function MessagesScreen() {
     apiRequest<{ user: User; messages: Message[] }>(`/messages/${username}`).then((res) => {
       setActive(res.user);
       setMessages(res.messages);
+      clearMessageUnread(res.user.id);
     });
   }, [username]);
 
   useEffect(() => {
     if (!active || username) return;
-    apiRequest<{ user: User; messages: Message[] }>(`/messages/${active.username}`).then((res) => setMessages(res.messages));
+    apiRequest<{ user: User; messages: Message[] }>(`/messages/${active.username}`).then((res) => {
+      setMessages(res.messages);
+      clearMessageUnread(res.user.id);
+    });
   }, [active, username]);
 
   useEffect(() => {
@@ -84,13 +93,16 @@ export default function MessagesScreen() {
           contentContainerStyle={styles.conversationList}
           ListEmptyComponent={<Text style={styles.empty}>Search a profile and tap Message to start a conversation.</Text>}
           renderItem={({ item }) => (
-            <Pressable style={styles.conversation} onPress={() => router.push(`/messages/${item.user.username}`)}>
-              <Avatar user={item.user} online={online[item.user.id]} />
+            <Pressable style={styles.conversation} onPress={() => router.push(`/(tabs)/messages/${item.user.username}` as never)}>
+              <View>
+                <Avatar user={item.user} online={online[item.user.id]} />
+                {Boolean(unreadMessages[item.user.id] || item.unread) && <View style={styles.greenDot} />}
+              </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.username}>@{item.user.username}</Text>
                 <Text style={styles.preview} numberOfLines={1}>{item.latest.content}</Text>
               </View>
-              {item.unread > 0 && <Text style={styles.badge}>{item.unread}</Text>}
+              {(unreadMessages[item.user.id] || item.unread) > 0 && <Text style={styles.badge}>{unreadMessages[item.user.id] || item.unread}</Text>}
             </Pressable>
           )}
         />
@@ -98,7 +110,13 @@ export default function MessagesScreen() {
       {active && (
         <View style={styles.chat}>
           <View style={styles.chatHeader}>
-            <Pressable onPress={() => setActive(null)}>
+            <Pressable
+              onPress={() => {
+                setActive(null);
+                setMessages([]);
+                router.replace("/(tabs)/messages" as never);
+              }}
+            >
               <Ionicons name="chevron-back" color={colors.text} size={24} />
             </Pressable>
             <Avatar user={active} online={online[active.id]} />
@@ -140,6 +158,7 @@ const styles = StyleSheet.create({
   username: { color: colors.text, fontWeight: "900" },
   preview: { color: colors.dim, marginTop: 2 },
   badge: { minWidth: 22, textAlign: "center", overflow: "hidden", borderRadius: 11, paddingHorizontal: 7, paddingVertical: 2, color: colors.text, backgroundColor: colors.rose },
+  greenDot: { position: "absolute", right: -2, top: -2, width: 12, height: 12, borderRadius: 6, backgroundColor: colors.lime, borderWidth: 2, borderColor: colors.panel },
   empty: { color: colors.dim, textAlign: "center", marginTop: 36 },
   chat: { flex: 1 },
   chatHeader: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14, borderBottomWidth: 1, borderBottomColor: colors.border },

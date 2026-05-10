@@ -94,12 +94,12 @@ export const PostCard = ({ post, onDelete }: Props) => {
   return (
     <View style={styles.card}>
       <View style={styles.row}>
-        <Pressable onPress={() => router.push(`/profile/${post.user.username}`)}>
+        <Pressable onPress={() => router.push(`/(tabs)/profile/${post.user.username}` as never)}>
           <Avatar user={post.user} />
         </Pressable>
         <View style={styles.body}>
           <View style={styles.metaRow}>
-            <Pressable onPress={() => router.push(`/profile/${post.user.username}`)}>
+            <Pressable onPress={() => router.push(`/(tabs)/profile/${post.user.username}` as never)}>
               <Text style={styles.username}>@{post.user.username}</Text>
             </Pressable>
             <Text style={styles.time}>{timeAgo(post.createdAt)}</Text>

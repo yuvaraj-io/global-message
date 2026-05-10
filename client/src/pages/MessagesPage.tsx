@@ -23,7 +23,10 @@ export const MessagesPage = () => {
     api.get("/messages/conversations").then((res) => {
       const nextConversations: Conversation[] = res.data.conversations;
       setConversations(nextConversations);
-      if (!username) setActive(nextConversations[0]?.user || null);
+      if (!username) {
+        setActive(null);
+        setMessages([]);
+      }
     });
   }, [username]);
 
@@ -40,9 +43,9 @@ export const MessagesPage = () => {
   }, [username]);
 
   useEffect(() => {
-    if (!active) return;
+    if (!active || username) return;
     api.get(`/messages/${active.username}`).then((res) => setMessages(res.data.messages));
-  }, [active]);
+  }, [active, username]);
 
   useEffect(() => {
     if (!socket) return;

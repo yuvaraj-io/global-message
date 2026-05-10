@@ -6,19 +6,25 @@ type SnackbarTone = "success" | "error" | "info";
 type ConfirmOptions = { title: string; message: string; confirmLabel?: string; tone?: "danger" | "default" };
 type PendingConfirm = ConfirmOptions & { resolve: (value: boolean) => void };
 
+type Snackbar = {
+  message: string;
+  tone: SnackbarTone;
+  onPress?: () => void;
+};
+
 type UIContextValue = {
   confirm: (options: ConfirmOptions) => Promise<boolean>;
-  showSnackbar: (message: string, tone?: SnackbarTone) => void;
+  showSnackbar: (message: string, tone?: SnackbarTone, onPress?: () => void) => void;
 };
 
 const UIContext = createContext<UIContextValue | null>(null);
 
 export const UIProvider = ({ children }: PropsWithChildren) => {
   const [pending, setPending] = useState<PendingConfirm | null>(null);
-  const [snackbar, setSnackbar] = useState<{ message: string; tone: SnackbarTone } | null>(null);
+  const [snackbar, setSnackbar] = useState<Snackbar | null>(null);
 
-  const showSnackbar = (message: string, tone: SnackbarTone = "info") => {
-    setSnackbar({ message, tone });
+  const showSnackbar = (message: string, tone: SnackbarTone = "info", onPress?: () => void) => {
+    setSnackbar({ message, tone, onPress });
     setTimeout(() => setSnackbar(null), 2800);
   };
 
@@ -54,9 +60,15 @@ export const UIProvider = ({ children }: PropsWithChildren) => {
         </View>
       </Modal>
       {snackbar && (
-        <View style={[styles.snackbar, snackbar.tone === "success" && styles.success, snackbar.tone === "error" && styles.error]}>
+        <Pressable
+          style={[styles.snackbar, snackbar.tone === "success" && styles.success, snackbar.tone === "error" && styles.error]}
+          onPress={() => {
+            snackbar.onPress?.();
+            setSnackbar(null);
+          }}
+        >
           <Text style={styles.snackbarText}>{snackbar.message}</Text>
-        </View>
+        </Pressable>
       )}
     </UIContext.Provider>
   );

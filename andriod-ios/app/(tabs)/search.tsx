@@ -38,14 +38,14 @@ export default function SearchScreen() {
         ListEmptyComponent={query.trim() ? <Text style={styles.empty}>No matching profiles found.</Text> : null}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <Pressable style={styles.user} onPress={() => router.push(`/profile/${item.username}`)}>
+            <Pressable style={styles.user} onPress={() => router.push(`/(tabs)/profile/${item.username}` as never)}>
               <Avatar user={item} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.username}>@{item.username}</Text>
                 <Text style={styles.bio} numberOfLines={1}>{item.bio}</Text>
               </View>
             </Pressable>
-            <Pressable style={styles.messageButton} onPress={() => router.push(`/messages/${item.username}`)}>
+            <Pressable style={styles.messageButton} onPress={() => router.push(`/(tabs)/messages/${item.username}` as never)}>
               <Ionicons name="chatbubble-outline" color={colors.bg} size={18} />
             </Pressable>
           </View>

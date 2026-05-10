@@ -1,8 +1,14 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
 import { Platform } from "react-native";
 
-export const API_URL =
-  process.env.EXPO_PUBLIC_API_URL || (Platform.OS === "android" ? "http://10.0.2.2:5001" : "http://localhost:5001");
+const getExpoHostApiUrl = () => {
+  const hostUri = Constants.expoConfig?.hostUri || Constants.manifest2?.extra?.expoClient?.hostUri;
+  const host = typeof hostUri === "string" ? hostUri.split(":")[0] : "";
+  return host ? `http://${host}:5001` : "";
+};
+
+export const API_URL = process.env.EXPO_PUBLIC_API_URL || getExpoHostApiUrl() || (Platform.OS === "android" ? "http://10.0.2.2:5001" : "http://localhost:5001");
 
 export const TOKEN_KEY = "global-space-token";
 

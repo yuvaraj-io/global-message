@@ -61,7 +61,12 @@ export const createSocketServer = (server: HttpServer) => {
     socket.on("message:send", async ({ receiverId, content }, ack) => {
       try {
         const message = await Message.create({ senderId: user.id, receiverId, content });
-        const payload = serializeMessage(message);
+        const [sender, receiver] = await Promise.all([User.findById(user.id), User.findById(receiverId)]);
+        const payload = {
+          ...serializeMessage(message),
+          sender: sender ? serializeUser(sender) : null,
+          receiver: receiver ? serializeUser(receiver) : null
+        };
         io.to(receiverId).emit("message:new", payload);
         io.to(user.id).emit("message:new", payload);
         ack?.({ ok: true, message: payload });
