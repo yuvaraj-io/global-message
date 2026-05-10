@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Avatar } from "@/src/components/Avatar";
 import { Header } from "@/src/components/Header";
@@ -43,13 +43,18 @@ export default function MessagesScreen() {
     });
   }, [username]);
 
-  useEffect(() => {
-    if (!active || username) return;
-    apiRequest<{ user: User; messages: Message[] }>(`/messages/${active.username}`).then((res) => {
-      setMessages(res.messages);
-      clearMessageUnread(res.user.id);
-    });
-  }, [active, username]);
+  useFocusEffect(
+    useCallback(() => {
+      if (username) {
+        apiRequest<{ user: User; messages: Message[] }>(`/messages/${username}`).then((res) => {
+          setActive(res.user);
+          setMessages(res.messages);
+          clearMessageUnread(res.user.id);
+        });
+      }
+    }, [username, clearMessageUnread])
+  );
+
 
   useEffect(() => {
     setActiveMessageUser(active?.id || null);
