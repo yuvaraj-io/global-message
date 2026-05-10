@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Message, Post, Reply, User } from "../types";
 import { useAuth } from "./AuthContext";
 import { useSocket } from "./SocketContext";
@@ -21,6 +21,7 @@ type NotificationContextValue = {
   unreadMessages: Record<string, number>;
   markAllRead: () => void;
   clearMessageUnread: (userId: string) => void;
+  setActiveMessageUser: (userId: string | null) => void;
   openNotification: (notification: AppNotification) => void;
 };
 
@@ -37,6 +38,7 @@ export const NotificationProvider = ({ children }: PropsWithChildren) => {
   const { showSnackbar } = useUI();
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [unreadMessages, setUnreadMessages] = useState<Record<string, number>>({});
+  const activeMessageUserRef = useRef<string | null>(null);
 
   const addNotification = (notification: Omit<AppNotification, "id" | "createdAt" | "read">) => {
     const next: AppNotification = {
@@ -84,13 +86,14 @@ export const NotificationProvider = ({ children }: PropsWithChildren) => {
 
     const onMessage = (message: RealtimeMessage) => {
       if (message.senderId === user.id) return;
+      if (activeMessageUserRef.current === message.senderId) return;
       const sender = message.sender;
       setUnreadMessages((current) => ({ ...current, [message.senderId]: (current[message.senderId] || 0) + 1 }));
       addNotification({
         type: "message",
         title: sender ? `New message from @${sender.username}` : "New private message",
         body: message.content,
-        route: sender ? `/(tabs)/messages/${sender.username}` : "/(tabs)/messages"
+        route: sender ? `/messages/${sender.username}` : "/messages"
       });
     };
 
@@ -112,6 +115,9 @@ export const NotificationProvider = ({ children }: PropsWithChildren) => {
       unreadMessages,
       markAllRead: () => setNotifications((current) => current.map((item) => ({ ...item, read: true }))),
       clearMessageUnread: (userId: string) => setUnreadMessages((current) => ({ ...current, [userId]: 0 })),
+      setActiveMessageUser: (userId: string | null) => {
+        activeMessageUserRef.current = userId;
+      },
       openNotification
     }),
     [notifications, unreadMessages]

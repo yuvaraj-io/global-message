@@ -1,3 +1,3 @@
-import MessagesScreen from "../messages/[username]";
+import MessagesScreen from "./messages/[username]";
 
 export default MessagesScreen;

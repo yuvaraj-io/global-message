@@ -17,7 +17,7 @@ export default function MessagesScreen() {
   const { username } = useLocalSearchParams<{ username?: string }>();
   const { user } = useAuth();
   const { socket, online } = useSocket();
-  const { unreadMessages, clearMessageUnread } = useNotifications();
+  const { unreadMessages, clearMessageUnread, setActiveMessageUser } = useNotifications();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [active, setActive] = useState<User | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -52,8 +52,31 @@ export default function MessagesScreen() {
   }, [active, username]);
 
   useEffect(() => {
-    if (!socket) return;
-    const onMessage = (message: Message) => setMessages((current) => (current.some((item) => item.id === message.id) ? current : [...current, message]));
+    setActiveMessageUser(active?.id || null);
+    return () => setActiveMessageUser(null);
+  }, [active?.id, setActiveMessageUser]);
+
+  useEffect(() => {
+    if (!socket || !user) return;
+    const onMessage = (message: Message) => {
+      setMessages((current) => (current.some((item) => item.id === message.id) ? current : [...current, message]));
+
+      const otherUser = message.senderId === user.id ? message.receiver : message.sender;
+      if (otherUser) {
+        setConversations((current) => {
+          const unreadIncrement = message.senderId !== user.id && active?.id !== message.senderId ? 1 : 0;
+          const existing = current.find((item) => item.user.id === otherUser.id);
+          const nextConversation: Conversation = {
+            user: otherUser,
+            latest: message,
+            unread: existing ? existing.unread + unreadIncrement : unreadIncrement
+          };
+          return [nextConversation, ...current.filter((item) => item.user.id !== otherUser.id)];
+        });
+      }
+
+      if (active?.id === message.senderId) clearMessageUnread(message.senderId);
+    };
     const onTyping = ({ username: typingUsername, typing: isTyping }: { username: string; typing: boolean }) => {
       setTyping(isTyping ? typingUsername : "");
       if (isTyping) setTimeout(() => setTyping(""), 1600);
@@ -64,7 +87,7 @@ export default function MessagesScreen() {
       socket.off("message:new", onMessage);
       socket.off("message:typing", onTyping);
     };
-  }, [socket]);
+  }, [active?.id, clearMessageUnread, socket, user]);
 
   const visibleMessages = useMemo(() => {
     if (!active || !user) return [];
@@ -93,7 +116,7 @@ export default function MessagesScreen() {
           contentContainerStyle={styles.conversationList}
           ListEmptyComponent={<Text style={styles.empty}>Search a profile and tap Message to start a conversation.</Text>}
           renderItem={({ item }) => (
-            <Pressable style={styles.conversation} onPress={() => router.push(`/(tabs)/messages/${item.user.username}` as never)}>
+            <Pressable style={styles.conversation} onPress={() => router.push(`/messages/${item.user.username}` as never)}>
               <View>
                 <Avatar user={item.user} online={online[item.user.id]} />
                 {Boolean(unreadMessages[item.user.id] || item.unread) && <View style={styles.greenDot} />}
@@ -114,7 +137,7 @@ export default function MessagesScreen() {
               onPress={() => {
                 setActive(null);
                 setMessages([]);
-                router.replace("/(tabs)/messages" as never);
+                router.replace("/messages" as never);
               }}
             >
               <Ionicons name="chevron-back" color={colors.text} size={24} />

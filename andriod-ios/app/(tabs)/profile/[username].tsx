@@ -82,7 +82,7 @@ export default function ProfileScreen() {
                   <Pressable style={styles.ghostButton} onPress={logout}><Text style={styles.ghostText}>Logout</Text></Pressable>
                 </>
               ) : (
-                <Pressable style={styles.primaryButton} onPress={() => router.push(`/(tabs)/messages/${profile.user.username}` as never)}><Ionicons name="chatbubble-outline" color={colors.bg} size={17} /><Text style={styles.primaryText}>Message</Text></Pressable>
+                <Pressable style={styles.primaryButton} onPress={() => router.push(`/messages/${profile.user.username}` as never)}><Ionicons name="chatbubble-outline" color={colors.bg} size={17} /><Text style={styles.primaryText}>Message</Text></Pressable>
               )}
             </View>
           </View>
