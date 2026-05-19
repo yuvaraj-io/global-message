@@ -19,12 +19,22 @@ const server = http.createServer(app);
 
 /**
  * CORS
- * For Expo + React Native development
- * allowing all origins is easiest.
+ * Allow the configured client origin plus localhost for local development.
  */
+const allowedOrigins = [
+  env.clientUrl,
+  "http://localhost:5173",
+  "http://localhost:19006", // Expo web
+];
+
 app.use(
   cors({
-    origin: "*",
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, Postman)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
     credentials: true,
   })
 );
