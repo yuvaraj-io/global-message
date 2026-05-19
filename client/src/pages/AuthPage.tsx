@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 import { FiArrowRight, FiGlobe } from "react-icons/fi";
-import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export const AuthPage = ({ mode }: { mode: "login" | "register" }) => {
@@ -30,35 +30,60 @@ export const AuthPage = ({ mode }: { mode: "login" | "register" }) => {
   };
 
   return (
-    <main className="grid min-h-screen place-items-center px-4 py-10 text-slate-100">
+    <main className="grid min-h-screen place-items-center bg-wa-chatBg px-4 py-10 text-wa-text">
       <div className="w-full max-w-md">
         <div className="mb-8 flex items-center gap-3">
-          <div className="grid h-12 w-12 place-items-center rounded-xl bg-space-cyan text-2xl text-space-950">
+          <div className="grid h-12 w-12 place-items-center rounded-xl bg-wa-green text-2xl text-white">
             <FiGlobe />
           </div>
           <div>
-            <h1 className="text-3xl font-black text-white">Global Space</h1>
-            <p className="text-sm text-slate-500">Realtime conversations, everywhere.</p>
+            <h1 className="text-3xl font-black text-wa-text">Global Space</h1>
+            <p className="text-sm text-wa-subtext">Realtime conversations, everywhere.</p>
           </div>
         </div>
 
         <form onSubmit={submit} className="panel rounded-xl p-6">
-          <h2 className="text-xl font-bold text-white">{mode === "register" ? "Create your account" : "Welcome back"}</h2>
+          <h2 className="text-xl font-bold text-wa-text">{mode === "register" ? "Create your account" : "Welcome back"}</h2>
           <div className="mt-6 space-y-4">
-            {mode === "register" && <input className="input" value={username} onChange={(event) => setUsername(event.target.value)} placeholder="username" required />}
-            <input className="input" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="email" required />
-            <input className="input" type="password" minLength={6} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="password" required />
+            {mode === "register" && (
+              <input
+                className="input"
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                placeholder="username"
+                required
+              />
+            )}
+            <input
+              className="input"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="email"
+              required
+            />
+            <input
+              className="input"
+              type="password"
+              minLength={6}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="password"
+              required
+            />
           </div>
-          {error && <div className="mt-4 rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>}
+          {error && (
+            <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
+          )}
           <button className="button-primary mt-6 w-full" disabled={loading}>
             {mode === "register" ? "Register" : "Login"}
             <FiArrowRight />
           </button>
         </form>
 
-        <p className="mt-5 text-center text-sm text-slate-500">
+        <p className="mt-5 text-center text-sm text-wa-subtext">
           {mode === "register" ? "Already have an account?" : "New around here?"}{" "}
-          <Link className="font-semibold text-space-cyan" to={mode === "register" ? "/login" : "/register"}>
+          <Link className="font-semibold text-wa-greenDark" to={mode === "register" ? "/login" : "/register"}>
             {mode === "register" ? "Login" : "Register"}
           </Link>
         </p>

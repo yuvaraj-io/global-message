@@ -29,10 +29,13 @@ export type Reply = {
 
 export type Message = {
   id: string;
+  clientId?: string;
   senderId: string;
   receiverId: string;
   content: string;
+  delivered?: boolean;
   seen: boolean;
+  pending?: boolean;
   createdAt: string;
 };
 

@@ -37,7 +37,7 @@ export const PostComposer = ({ onCreate }: Props) => {
             placeholder="Start a global discussion..."
           />
           <div className="mt-3 flex items-center justify-between">
-            <span className="text-xs text-slate-500">{content.length}/420</span>
+            <span className="text-xs text-wa-muted">{content.length}/420</span>
             <button className="button-primary" disabled={!content.trim() || sending} type="submit">
               <FiSend />
               Publish

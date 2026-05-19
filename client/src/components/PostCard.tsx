@@ -118,30 +118,30 @@ export const PostCard = ({ post, onReply, onDelete }: Props) => {
     replies
       .filter((item) => item.parentReplyId === parentId)
       .map((child) => (
-        <div key={child.id} className="ml-8 border-l border-white/10 pl-4">
+        <div key={child.id} className="ml-8 border-l border-wa-border pl-4">
           <ReplyRow reply={child} canDelete={user?.id === child.user.id} onDelete={deleteReply} />
         </div>
       ));
 
   return (
-    <article className="panel rounded-xl p-4 transition hover:border-white/20">
+    <article className="panel rounded-xl p-4 transition hover:shadow-card">
       <div className="flex gap-3">
         <UserAvatar user={post.user} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <Link className="font-semibold text-white hover:text-space-cyan" to={`/profile/${post.user.username}`}>
+            <Link className="font-semibold text-wa-text hover:text-wa-greenDark" to={`/profile/${post.user.username}`}>
               @{post.user.username}
             </Link>
-            <span className="text-xs text-slate-500">{timeAgo(post.createdAt)}</span>
+            <span className="text-xs text-wa-muted">{timeAgo(post.createdAt)}</span>
             {isOwner && (
-              <button className="ml-auto inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-slate-500 transition hover:bg-red-500/10 hover:text-red-200" onClick={deletePost}>
+              <button className="ml-auto inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-wa-muted transition hover:bg-red-50 hover:text-red-600" onClick={deletePost}>
                 <FiTrash2 />
                 Delete
               </button>
             )}
           </div>
-          <p className="mt-2 whitespace-pre-wrap break-words text-[15px] leading-6 text-slate-100">{post.content}</p>
-          <button className="mt-4 inline-flex items-center gap-2 text-sm text-slate-400 hover:text-space-cyan" onClick={() => setOpen((value) => !value)}>
+          <p className="mt-2 whitespace-pre-wrap break-words text-[15px] leading-6 text-wa-text">{post.content}</p>
+          <button className="mt-4 inline-flex items-center gap-2 text-sm text-wa-subtext hover:text-wa-greenDark" onClick={() => setOpen((value) => !value)}>
             <FiMessageCircle />
             {count} replies
           </button>
@@ -149,7 +149,7 @@ export const PostCard = ({ post, onReply, onDelete }: Props) => {
       </div>
 
       {open && (
-        <div className="mt-4 space-y-3 border-t border-white/10 pt-4">
+        <div className="mt-4 space-y-3 border-t border-wa-border pt-4">
           <form onSubmit={submitReply} className="flex gap-2">
             <input className="input" value={reply} onChange={(event) => setReply(event.target.value)} placeholder="Reply to this discussion" />
             <button className="button-primary aspect-square px-3" type="submit" aria-label="Send reply">
@@ -169,23 +169,23 @@ export const PostCard = ({ post, onReply, onDelete }: Props) => {
 };
 
 const ReplyRow = ({ reply, canDelete, onDelete }: { reply: Reply; canDelete?: boolean; onDelete?: (replyId: string) => void }) => (
-  <div className="flex gap-3 rounded-lg bg-white/[0.03] p-3">
+  <div className="flex gap-3 rounded-lg bg-wa-chatBg p-3">
     <UserAvatar user={reply.user} size="sm" />
     <div className="min-w-0">
       <div className="flex items-center gap-2 text-sm">
-        <Link to={`/profile/${reply.user.username}`} className="font-medium text-white hover:text-space-cyan">
+        <Link to={`/profile/${reply.user.username}`} className="font-medium text-wa-text hover:text-wa-greenDark">
           @{reply.user.username}
         </Link>
-        <span className="text-xs text-slate-500">{timeAgo(reply.createdAt)}</span>
+        <span className="text-xs text-wa-muted">{timeAgo(reply.createdAt)}</span>
         {canDelete && (
-          <button className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-slate-500 transition hover:bg-red-500/10 hover:text-red-200" onClick={() => onDelete?.(reply.id)}>
+          <button className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-wa-muted transition hover:bg-red-50 hover:text-red-600" onClick={() => onDelete?.(reply.id)}>
             <FiTrash2 />
             Delete
           </button>
         )}
       </div>
-      <p className="mt-1 break-words text-sm text-slate-300">{reply.content}</p>
-      <span className="mt-2 inline-flex items-center gap-1 text-xs text-slate-500">
+      <p className="mt-1 break-words text-sm text-wa-text">{reply.content}</p>
+      <span className="mt-2 inline-flex items-center gap-1 text-xs text-wa-muted">
         <FiCornerDownRight />
         reply
       </span>

@@ -14,11 +14,15 @@ const sizes = {
 
 export const UserAvatar = ({ user, size = "md", online }: Props) => (
   <div className="relative shrink-0">
-    <img className={`${sizes[size]} rounded-full border border-white/10 object-cover`} src={user.avatar} alt={user.username} />
+    <img
+      className={`${sizes[size]} rounded-full border border-wa-border bg-wa-chatBg object-cover`}
+      src={user.avatar}
+      alt={user.username}
+    />
     {online !== undefined && (
       <span
-        className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-space-900 ${
-          online ? "bg-emerald-400" : "bg-slate-500"
+        className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white ${
+          online ? "bg-wa-greenAccent" : "bg-wa-muted"
         }`}
       />
     )}

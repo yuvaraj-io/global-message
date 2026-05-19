@@ -36,6 +36,7 @@ export const serializeMessage = (message: any) => ({
   senderId: String(message.senderId?._id || message.senderId),
   receiverId: String(message.receiverId?._id || message.receiverId),
   content: message.content,
+  delivered: message.delivered || false,
   seen: message.seen,
   createdAt: message.createdAt
 });

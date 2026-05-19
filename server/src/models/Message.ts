@@ -5,6 +5,7 @@ const messageSchema = new mongoose.Schema(
     senderId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
     receiverId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
     content: { type: String, required: true, trim: true, maxlength: 1200 },
+    delivered: { type: Boolean, default: false },
     seen: { type: Boolean, default: false }
   },
   { timestamps: true }

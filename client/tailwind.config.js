@@ -6,16 +6,29 @@ export default {
         sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"]
       },
       colors: {
-        space: {
-          950: "#080b12",
-          900: "#0d111c",
-          850: "#111827",
-          800: "#171f2e",
-          700: "#253044",
-          cyan: "#4dd6d6",
-          lime: "#b5f36d",
-          rose: "#ff6b9a"
+        wa: {
+          bg: "#efeae2",
+          chatBg: "#f0f2f5",
+          panel: "#ffffff",
+          border: "#e9edef",
+          divider: "#e9edef",
+          header: "#f0f2f5",
+          sidebar: "#ffffff",
+          bubbleOut: "#d9fdd3",
+          bubbleIn: "#ffffff",
+          green: "#00a884",
+          greenDark: "#008069",
+          greenAccent: "#25d366",
+          blueTick: "#53bdeb",
+          text: "#111b21",
+          subtext: "#667781",
+          muted: "#8696a0",
+          unread: "#25d366"
         }
+      },
+      boxShadow: {
+        bubble: "0 1px 0.5px rgba(11, 20, 26, 0.13)",
+        card: "0 1px 3px rgba(11, 20, 26, 0.08)"
       }
     }
   },

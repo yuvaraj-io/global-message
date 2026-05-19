@@ -49,11 +49,11 @@ export const HomePage = () => {
 
   return (
     <div className="mx-auto max-w-2xl space-y-4">
-      <header className="sticky top-0 z-10 -mx-4 border-b border-white/10 bg-space-950/80 px-4 py-4 backdrop-blur lg:top-0">
+      <header className="sticky top-0 z-10 -mx-4 border-b border-wa-border bg-white/90 px-4 py-4 backdrop-blur lg:top-0">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-black text-white">Global Feed</h1>
-            <p className="text-sm text-slate-500">Live discussions from every profile.</p>
+            <h1 className="text-2xl font-black text-wa-text">Global Feed</h1>
+            <p className="text-sm text-wa-subtext">Live discussions from every profile.</p>
           </div>
           <button className="button-ghost aspect-square px-3" onClick={() => load()} aria-label="Refresh feed">
             <FiRefreshCcw />
