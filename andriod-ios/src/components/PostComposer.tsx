@@ -34,7 +34,7 @@ export const PostComposer = () => {
         <View style={styles.footer}>
           <Text style={styles.count}>{content.length}/420</Text>
           <Pressable style={[styles.button, !content.trim() && styles.disabled]} onPress={submit}>
-            <Ionicons name="send" color={colors.bg} size={16} />
+            <Ionicons name="send" color="#fff" size={16} />
             <Text style={styles.buttonText}>Publish</Text>
           </Pressable>
         </View>
@@ -51,5 +51,5 @@ const styles = StyleSheet.create({
   count: { color: colors.dim, fontSize: 12 },
   button: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, backgroundColor: colors.cyan },
   disabled: { opacity: 0.45 },
-  buttonText: { color: colors.bg, fontWeight: "800" }
+  buttonText: { color: "#fff", fontWeight: "800" }
 });

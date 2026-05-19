@@ -172,7 +172,7 @@ export default function MessagesScreen() {
           {typing ? <Text style={styles.typing}>@{typing} is typing...</Text> : null}
           <View style={styles.inputRow}>
             <TextInput style={styles.input} value={content} onChangeText={type} placeholder="Send a private message" placeholderTextColor={colors.dim} />
-            <Pressable style={styles.sendButton} onPress={send}><Ionicons name="send" color={colors.bg} size={18} /></Pressable>
+            <Pressable style={styles.sendButton} onPress={send}><Ionicons name="send" color="#fff" size={18} /></Pressable>
           </View>
         </View>
       )}
@@ -185,22 +185,22 @@ const styles = StyleSheet.create({
   conversation: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14, borderRadius: 16, backgroundColor: colors.panel, borderWidth: 1, borderColor: colors.border, ...shadow },
   username: { color: colors.text, fontWeight: "900" },
   preview: { color: colors.dim, marginTop: 2 },
-  badge: { minWidth: 22, textAlign: "center", overflow: "hidden", borderRadius: 11, paddingHorizontal: 7, paddingVertical: 2, color: colors.text, backgroundColor: colors.rose },
-  greenDot: { position: "absolute", right: -2, top: -2, width: 12, height: 12, borderRadius: 6, backgroundColor: colors.lime, borderWidth: 2, borderColor: colors.panel },
+  badge: { minWidth: 22, textAlign: "center", overflow: "hidden", borderRadius: 11, paddingHorizontal: 7, paddingVertical: 2, color: "#fff", backgroundColor: colors.unread },
+  greenDot: { position: "absolute", right: -2, top: -2, width: 12, height: 12, borderRadius: 6, backgroundColor: colors.unread, borderWidth: 2, borderColor: colors.panel },
   empty: { color: colors.dim, textAlign: "center", marginTop: 36 },
-  chat: { flex: 1 },
-  chatHeader: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14, borderBottomWidth: 1, borderBottomColor: colors.border },
-  messageList: { padding: 16, gap: 10 },
+  chat: { flex: 1, backgroundColor: colors.chatBg },
+  chatHeader: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14, borderBottomWidth: 1, borderBottomColor: colors.border, backgroundColor: colors.panel },
+  messageList: { padding: 16, gap: 6 },
   messageWrap: { flexDirection: "row", justifyContent: "flex-start" },
   mineWrap: { justifyContent: "flex-end" },
-  bubble: { maxWidth: "80%", padding: 12, borderRadius: 16, backgroundColor: colors.panel2 },
-  mineBubble: { backgroundColor: colors.cyan },
-  messageText: { color: colors.text },
-  mineText: { color: colors.bg },
-  messageTime: { color: colors.dim, fontSize: 11, marginTop: 4, textAlign: "right" },
-  mineTime: { color: "rgba(8,11,18,0.65)" },
-  typing: { color: colors.dim, paddingHorizontal: 16, paddingBottom: 8 },
-  inputRow: { flexDirection: "row", gap: 8, padding: 12, borderTopWidth: 1, borderTopColor: colors.border },
-  input: { flex: 1, minHeight: 44, borderRadius: 13, paddingHorizontal: 12, color: colors.text, backgroundColor: colors.panel, borderWidth: 1, borderColor: colors.border },
-  sendButton: { width: 44, height: 44, borderRadius: 13, alignItems: "center", justifyContent: "center", backgroundColor: colors.cyan }
+  bubble: { maxWidth: "80%", padding: 10, paddingHorizontal: 12, borderRadius: 16, borderBottomLeftRadius: 4, backgroundColor: colors.bubbleIn, shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 2, shadowOffset: { width: 0, height: 1 }, elevation: 1 },
+  mineBubble: { backgroundColor: colors.bubbleOut, borderBottomLeftRadius: 16, borderBottomRightRadius: 4 },
+  messageText: { color: colors.text, fontSize: 15, lineHeight: 20 },
+  mineText: { color: colors.text },
+  messageTime: { color: colors.muted, fontSize: 11, marginTop: 4, textAlign: "right" },
+  mineTime: { color: colors.muted },
+  typing: { color: colors.muted, paddingHorizontal: 16, paddingBottom: 8, fontStyle: "italic" },
+  inputRow: { flexDirection: "row", gap: 8, padding: 12, borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.panel },
+  input: { flex: 1, minHeight: 44, borderRadius: 22, paddingHorizontal: 16, color: colors.text, backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border },
+  sendButton: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center", backgroundColor: colors.cyan }
 });

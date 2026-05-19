@@ -46,7 +46,7 @@ export default function SearchScreen() {
               </View>
             </Pressable>
             <Pressable style={styles.messageButton} onPress={() => router.push(`/messages/${item.username}` as never)}>
-              <Ionicons name="chatbubble-outline" color={colors.bg} size={18} />
+              <Ionicons name="chatbubble-outline" color="#fff" size={18} />
             </Pressable>
           </View>
         )}

@@ -82,7 +82,7 @@ export default function ProfileScreen() {
                   <Pressable style={styles.ghostButton} onPress={logout}><Text style={styles.ghostText}>Logout</Text></Pressable>
                 </>
               ) : (
-                <Pressable style={styles.primaryButton} onPress={() => router.push(`/messages/${profile.user.username}` as never)}><Ionicons name="chatbubble-outline" color={colors.bg} size={17} /><Text style={styles.primaryText}>Message</Text></Pressable>
+                <Pressable style={styles.primaryButton} onPress={() => router.push(`/messages/${profile.user.username}` as never)}><Ionicons name="chatbubble-outline" color="#fff" size={17} /><Text style={styles.primaryText}>Message</Text></Pressable>
               )}
             </View>
           </View>
@@ -91,7 +91,7 @@ export default function ProfileScreen() {
               <Image source={{ uri: avatar }} style={styles.preview} />
               <Pressable style={styles.ghostButton} onPress={pickAvatar}><Text style={styles.ghostText}>Upload photo</Text></Pressable>
               <TextInput style={styles.bioInput} value={bio} onChangeText={setBio} multiline maxLength={160} placeholderTextColor={colors.dim} />
-              <Pressable style={styles.primaryButton} onPress={saveProfile}><Ionicons name="save-outline" color={colors.bg} size={17} /><Text style={styles.primaryText}>Save profile</Text></Pressable>
+              <Pressable style={styles.primaryButton} onPress={saveProfile}><Ionicons name="save-outline" color="#fff" size={17} /><Text style={styles.primaryText}>Save profile</Text></Pressable>
             </View>
           ) : (
             <>
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   topRow: { flexDirection: "row", justifyContent: "space-between", gap: 12 },
   actions: { flexDirection: "row", gap: 8, alignItems: "flex-start", flexWrap: "wrap", justifyContent: "flex-end", flex: 1 },
   primaryButton: { flexDirection: "row", gap: 7, alignItems: "center", justifyContent: "center", paddingHorizontal: 14, paddingVertical: 11, borderRadius: 12, backgroundColor: colors.cyan },
-  primaryText: { color: colors.bg, fontWeight: "900" },
+  primaryText: { color: "#fff", fontWeight: "900" },
   ghostButton: { paddingHorizontal: 14, paddingVertical: 11, borderRadius: 12, borderWidth: 1, borderColor: colors.border },
   ghostText: { color: colors.text, fontWeight: "800" },
   bio: { color: colors.text, marginTop: 14, lineHeight: 21 },
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   bioInput: { minHeight: 88, borderRadius: 12, padding: 12, color: colors.text, backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border, textAlignVertical: "top" },
   tabs: { flexDirection: "row", marginHorizontal: 16, marginBottom: 12, padding: 4, borderRadius: 14, backgroundColor: colors.panel, borderWidth: 1, borderColor: colors.border },
   tab: { flex: 1, paddingVertical: 9, alignItems: "center", borderRadius: 10 },
-  activeTab: { backgroundColor: "rgba(255,255,255,0.10)" },
+  activeTab: { backgroundColor: "rgba(0,168,132,0.12)" },
   tabText: { color: colors.dim, fontSize: 12, fontWeight: "800" },
   activeTabText: { color: colors.text },
   replyCard: { marginHorizontal: 16, marginBottom: 12, padding: 14, borderRadius: 16, backgroundColor: colors.panel, borderWidth: 1, borderColor: colors.border },

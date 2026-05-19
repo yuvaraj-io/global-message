@@ -1,21 +1,29 @@
 export const colors = {
-  bg: "#080b12",
-  panel: "#0d111c",
-  panel2: "#111827",
-  border: "rgba(255,255,255,0.10)",
-  text: "#f8fafc",
-  muted: "#94a3b8",
-  dim: "#64748b",
-  cyan: "#4dd6d6",
-  lime: "#b5f36d",
-  rose: "#ff6b9a",
+  bg: "#f0f2f5",
+  panel: "#ffffff",
+  panel2: "#f0f2f5",
+  chatBg: "#efeae2",
+  border: "#e9edef",
+  text: "#111b21",
+  subtext: "#667781",
+  muted: "#8696a0",
+  dim: "#8696a0",
+  green: "#00a884",
+  greenDark: "#008069",
+  cyan: "#00a884",       // alias so existing cyan refs stay green
+  lime: "#25d366",       // alias so badge refs stay green
+  rose: "#ef4444",
+  bubbleOut: "#d9fdd3",
+  bubbleIn: "#ffffff",
+  blueTick: "#53bdeb",
+  unread: "#25d366",
   danger: "#ef4444"
 };
 
 export const shadow = {
   shadowColor: "#000",
-  shadowOpacity: 0.25,
-  shadowRadius: 16,
-  shadowOffset: { width: 0, height: 8 },
-  elevation: 5
+  shadowOpacity: 0.06,
+  shadowRadius: 4,
+  shadowOffset: { width: 0, height: 1 },
+  elevation: 2
 };

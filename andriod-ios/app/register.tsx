@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   input: { height: 50, borderRadius: 12, paddingHorizontal: 14, color: colors.text, backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border },
   button: { height: 50, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: colors.cyan },
   disabled: { opacity: 0.6 },
-  buttonText: { color: colors.bg, fontWeight: "900" },
+  buttonText: { color: "#fff", fontWeight: "900" },
   switchText: { color: colors.dim, textAlign: "center", marginTop: 18 },
   link: { color: colors.cyan, fontWeight: "800" }
 });

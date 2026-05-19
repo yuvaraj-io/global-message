@@ -122,7 +122,7 @@ export const PostCard = ({ post, onDelete }: Props) => {
           <View style={styles.replyInputRow}>
             <TextInput style={styles.replyInput} value={reply} onChangeText={setReply} placeholder="Reply..." placeholderTextColor={colors.dim} />
             <Pressable style={styles.sendButton} onPress={submitReply}>
-              <Ionicons name="send" color={colors.bg} size={16} />
+              <Ionicons name="send" color="#fff" size={16} />
             </Pressable>
           </View>
           {topLevelReplies.map((item) => (
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   replyInputRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   replyInput: { flex: 1, minHeight: 42, borderRadius: 12, paddingHorizontal: 12, color: colors.text, backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border },
   sendButton: { width: 42, height: 42, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: colors.cyan },
-  replyRow: { flexDirection: "row", gap: 10, padding: 10, borderRadius: 12, backgroundColor: "rgba(255,255,255,0.035)" },
+  replyRow: { flexDirection: "row", gap: 10, padding: 10, borderRadius: 12, backgroundColor: colors.bg },
   replyBody: { flex: 1 },
   replyUser: { color: colors.text, fontWeight: "700", fontSize: 13 },
   replyContent: { color: colors.muted, marginTop: 4, lineHeight: 19 }
