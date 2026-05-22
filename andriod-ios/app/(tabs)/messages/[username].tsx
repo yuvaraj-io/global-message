@@ -53,6 +53,10 @@ export default function MessagesScreen() {
           clearMessageUnread(res.user.id);
           setConversations((current) => current.map((c) => (c.user.id === res.user.id ? { ...c, unread: 0 } : c)));
         });
+      } else {
+        apiRequest<{ conversations: Conversation[] }>("/messages/conversations").then((res) => {
+          setConversations(res.conversations);
+        });
       }
     }, [username, clearMessageUnread])
   );
