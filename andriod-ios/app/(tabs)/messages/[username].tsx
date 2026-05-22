@@ -64,6 +64,14 @@ export default function MessagesScreen() {
   }, [active?.id, setActiveMessageUser]);
 
   useEffect(() => {
+    if (!socket || !active || !user) return;
+    const hasUnseenFromOther = messages.some((m) => m.senderId === active.id && !m.seen);
+    if (hasUnseenFromOther) {
+      socket.emit("message:seen", { senderId: active.id });
+    }
+  }, [socket, active, user, messages]);
+
+  useEffect(() => {
     if (!socket || !user) return;
     const onMessage = (message: Message) => {
       setMessages((current) => (current.some((item) => item.id === message.id) ? current : [...current, message]));
