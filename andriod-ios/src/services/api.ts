@@ -8,7 +8,7 @@ const getExpoHostApiUrl = () => {
   return host ? `http://${host}:5001` : "";
 };
 
-export const API_URL = process.env.EXPO_PUBLIC_API_URL || getExpoHostApiUrl() || (Platform.OS === "android" ? "http://10.0.2.2:5001" : "http://localhost:5001");
+export const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://discuss.yuvaraj.io";
 
 export const TOKEN_KEY = "global-space-token";
 
