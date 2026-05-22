@@ -67,6 +67,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Ionicons size={24} name="person" color={color} />
         }}
       />
+      <Tabs.Screen name="post/[id]" options={{ href: null }} />
       <Tabs.Screen name="profile/[username]" options={{ href: null }} />
       <Tabs.Screen name="messages/[username]" options={{ href: null }} />
       <Tabs.Screen name="explore" options={{ href: null }} />

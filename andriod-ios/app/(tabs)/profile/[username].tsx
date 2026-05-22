@@ -17,8 +17,9 @@ import { colors, shadow } from "@/src/utils/theme";
 
 type ProfilePayload = { user: User; posts: Post[]; replies: Reply[]; discussions: Discussion[] };
 
-export default function ProfileScreen() {
-  const { username } = useLocalSearchParams<{ username: string }>();
+export default function ProfileScreen({ overrideUsername }: { overrideUsername?: string } = {}) {
+  const params = useLocalSearchParams<{ username: string }>();
+  const username = overrideUsername || params.username;
   const { user, updateUser, logout } = useAuth();
   const { showSnackbar, confirm } = useUI();
   const [profile, setProfile] = useState<ProfilePayload | null>(null);

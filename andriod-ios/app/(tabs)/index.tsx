@@ -47,6 +47,7 @@ export default function HomeScreen() {
         <FlatList
           data={posts}
           keyExtractor={(item) => item.id}
+          keyboardShouldPersistTaps="handled"
           ListHeaderComponent={<PostComposer />}
           renderItem={({ item }) => <PostCard post={item} onDelete={(postId) => setPosts((current) => current.filter((post) => post.id !== postId))} />}
           onEndReached={() => cursor && load(cursor)}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../context/AuthContext";
 import { useSocket } from "../context/SocketContext";
@@ -8,14 +8,17 @@ import { colors, shadow } from "../utils/theme";
 
 export const PostComposer = () => {
   const [content, setContent] = useState("");
+  const [sending, setSending] = useState(false);
   const { user } = useAuth();
   const { socket } = useSocket();
 
   const submit = () => {
     const trimmed = content.trim();
-    if (!trimmed || !socket) return;
+    if (!trimmed || !socket || sending) return;
+    setSending(true);
     socket.emit("post:create", { content: trimmed });
     setContent("");
+    setTimeout(() => setSending(false), 800);
   };
 
   return (
@@ -33,9 +36,9 @@ export const PostComposer = () => {
         />
         <View style={styles.footer}>
           <Text style={styles.count}>{content.length}/420</Text>
-          <Pressable style={[styles.button, !content.trim() && styles.disabled]} onPress={submit}>
-            <Ionicons name="send" color="#fff" size={16} />
-            <Text style={styles.buttonText}>Publish</Text>
+          <Pressable style={[styles.button, (!content.trim() || sending) && styles.disabled]} onPress={submit} disabled={!content.trim() || sending}>
+            {sending ? <ActivityIndicator color="#fff" size={16} /> : <Ionicons name="send" color="#fff" size={16} />}
+            <Text style={styles.buttonText}>{sending ? "Posting..." : "Publish"}</Text>
           </Pressable>
         </View>
       </View>

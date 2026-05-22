@@ -17,6 +17,12 @@ export const getPosts = asyncHandler(async (req, res) => {
   });
 });
 
+export const getPost = asyncHandler(async (req, res) => {
+  const post = await Post.findById(req.params.postId).populate("userId");
+  if (!post) return res.status(404).json({ message: "Post not found" });
+  res.json({ post: serializePost(post) });
+});
+
 export const createPost = asyncHandler(async (req, res) => {
   const post = await Post.create({ content: req.body.content, userId: req.user!.id });
   await post.populate("userId");

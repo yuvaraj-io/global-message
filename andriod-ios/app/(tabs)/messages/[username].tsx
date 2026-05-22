@@ -136,7 +136,7 @@ export default function MessagesScreen() {
         />
       )}
       {active && (
-        <KeyboardAvoidingView style={styles.chat} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}>
+        <KeyboardAvoidingView style={styles.chat} behavior={Platform.OS === "ios" ? "padding" : "height"}>
           <View style={styles.chatHeader}>
             <Pressable
               onPress={() => {
@@ -156,6 +156,7 @@ export default function MessagesScreen() {
           <FlatList
             data={visibleMessages}
             keyExtractor={(item) => item.id}
+            keyboardShouldPersistTaps="handled"
             contentContainerStyle={styles.messageList}
             renderItem={({ item }) => {
               const mine = item.senderId === user?.id;
