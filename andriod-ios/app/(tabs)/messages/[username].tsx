@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Avatar } from "@/src/components/Avatar";
 import { Header } from "@/src/components/Header";
 import { Screen } from "@/src/components/Screen";
@@ -136,7 +136,7 @@ export default function MessagesScreen() {
         />
       )}
       {active && (
-        <View style={styles.chat}>
+        <KeyboardAvoidingView style={styles.chat} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}>
           <View style={styles.chatHeader}>
             <Pressable
               onPress={() => {
@@ -174,7 +174,7 @@ export default function MessagesScreen() {
             <TextInput style={styles.input} value={content} onChangeText={type} placeholder="Send a private message" placeholderTextColor={colors.dim} />
             <Pressable style={styles.sendButton} onPress={send}><Ionicons name="send" color="#fff" size={18} /></Pressable>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       )}
     </Screen>
   );
