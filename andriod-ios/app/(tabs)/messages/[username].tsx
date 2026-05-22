@@ -40,6 +40,7 @@ export default function MessagesScreen() {
       setActive(res.user);
       setMessages(res.messages);
       clearMessageUnread(res.user.id);
+      setConversations((current) => current.map((c) => (c.user.id === res.user.id ? { ...c, unread: 0 } : c)));
     });
   }, [username]);
 
@@ -50,6 +51,7 @@ export default function MessagesScreen() {
           setActive(res.user);
           setMessages(res.messages);
           clearMessageUnread(res.user.id);
+          setConversations((current) => current.map((c) => (c.user.id === res.user.id ? { ...c, unread: 0 } : c)));
         });
       }
     }, [username, clearMessageUnread])
