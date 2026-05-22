@@ -129,7 +129,7 @@ export default function ProfileScreen({ overrideUsername }: { overrideUsername?:
 }
 
 const styles = StyleSheet.create({
-  cover: { height: 92, backgroundColor: colors.cyan, opacity: 0.78 },
+  cover: { height: 92, backgroundColor: "#1C1C1C" },
   card: { margin: 16, marginTop: -38, padding: 16, borderRadius: 18, backgroundColor: colors.panel, borderWidth: 1, borderColor: colors.border, ...shadow },
   topRow: { flexDirection: "row", justifyContent: "space-between", gap: 12 },
   actions: { flexDirection: "row", gap: 8, alignItems: "flex-start", flexWrap: "wrap", justifyContent: "flex-end", flex: 1 },
