@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FlatList, RefreshControl } from "react-native";
+import { useFocusEffect } from "expo-router";
 import { Header } from "@/src/components/Header";
 import { LoadingState } from "@/src/components/LoadingState";
 import { PostCard } from "@/src/components/PostCard";
@@ -28,6 +29,12 @@ export default function HomeScreen() {
   useEffect(() => {
     load();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      load();
+    }, [])
+  );
 
   useEffect(() => {
     if (!socket) return;
