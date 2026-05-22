@@ -25,13 +25,13 @@ export default function MessagesScreen() {
   const [typing, setTyping] = useState("");
 
   useEffect(() => {
-    apiRequest<{ conversations: Conversation[] }>("/messages/conversations").then((res) => {
-      setConversations(res.conversations);
-      if (!username) {
-        setActive(null);
-        setMessages([]);
-      }
-    });
+    if (!username) {
+      setActive(null);
+      setMessages([]);
+      apiRequest<{ conversations: Conversation[] }>("/messages/conversations").then((res) => {
+        setConversations(res.conversations);
+      });
+    }
   }, [username]);
 
   useEffect(() => {
