@@ -10,7 +10,7 @@ type AuthContextValue = {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string) => Promise<void>;
-  googleLogin: (idToken: string) => Promise<void>;
+  googleLogin: (idToken: string, userInfo?: any) => Promise<void>;
   forgotPassword: (email: string) => Promise<string>;
   resetPassword: (email: string, token: string, password: string) => Promise<string>;
   updateUser: (user: User) => void;
@@ -80,11 +80,11 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         });
         await saveSession(res.token, res.user);
       },
-      googleLogin: async (idToken: string) => {
+      googleLogin: async (idToken: string, userInfo?: any) => {
         const res = await apiRequest<{ token: string; user: User }>("/auth/google", {
           method: "POST",
           auth: false,
-          body: JSON.stringify({ idToken })
+          body: JSON.stringify({ idToken, userInfo })
         });
         await saveSession(res.token, res.user);
       },

@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import * as AuthSession from "expo-auth-session";
+import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
 import { Link, Redirect } from "expo-router";
 import { useEffect, useState } from "react";
@@ -12,13 +12,6 @@ import { colors, shadow } from "@/src/utils/theme";
 
 WebBrowser.maybeCompleteAuthSession();
 
-const GOOGLE_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || "";
-
-const discovery = {
-  authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth",
-  tokenEndpoint: "https://oauth2.googleapis.com/token"
-};
-
 export default function LoginScreen() {
   const { user, login, googleLogin } = useAuth();
   const { showSnackbar } = useUI();
@@ -27,22 +20,33 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  const [request, response, promptAsync] = AuthSession.useAuthRequest(
-    {
-      clientId: GOOGLE_CLIENT_ID,
-      scopes: ["openid", "profile", "email"],
-      responseType: AuthSession.ResponseType.IdToken,
-      redirectUri: AuthSession.makeRedirectUri()
-    },
-    discovery
-  );
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
+    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    scopes: ["openid", "profile", "email"]
+  });
 
   useEffect(() => {
-    if (response?.type === "success" && response.params.id_token) {
-      setGoogleLoading(true);
-      googleLogin(response.params.id_token)
-        .catch((error) => showSnackbar(getErrorMessage(error), "error"))
-        .finally(() => setGoogleLoading(false));
+    if (response?.type === "success") {
+      const idToken = response.authentication?.idToken;
+      const accessToken = response.authentication?.accessToken;
+      if (idToken) {
+        setGoogleLoading(true);
+        googleLogin(idToken)
+          .catch((error) => showSnackbar(getErrorMessage(error), "error"))
+          .finally(() => setGoogleLoading(false));
+      } else if (accessToken) {
+        // fallback: fetch user info and send access token
+        setGoogleLoading(true);
+        fetch("https://www.googleapis.com/userinfo/v2/me", {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        })
+          .then((res) => res.json())
+          .then((userInfo) => googleLogin(accessToken, userInfo))
+          .catch((error) => showSnackbar(getErrorMessage(error), "error"))
+          .finally(() => setGoogleLoading(false));
+      }
     }
   }, [response]);
 

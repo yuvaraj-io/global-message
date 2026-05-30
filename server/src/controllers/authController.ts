@@ -100,14 +100,31 @@ export const resetPassword = asyncHandler(async (req, res) => {
 });
 
 export const googleAuth = asyncHandler(async (req, res) => {
-  const { idToken } = req.body;
-  if (!idToken) return res.status(400).json({ message: "Google ID token is required" });
+  const { idToken, userInfo } = req.body;
 
-  const ticket = await googleClient.verifyIdToken({ idToken, audience: env.googleClientId });
-  const payload = ticket.getPayload();
-  if (!payload || !payload.email) return res.status(400).json({ message: "Invalid Google token" });
+  let googleId: string, email: string, name: string | undefined, picture: string | undefined;
 
-  const { sub: googleId, email, name, picture } = payload;
+  if (idToken) {
+    // Verify ID token (web flow or when idToken is available)
+    const ticket = await googleClient.verifyIdToken({
+      idToken,
+      audience: [env.googleClientId, env.googleAndroidClientId].filter(Boolean)
+    });
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email) return res.status(400).json({ message: "Invalid Google token" });
+    googleId = payload.sub;
+    email = payload.email;
+    name = payload.name;
+    picture = payload.picture;
+  } else if (userInfo?.email && userInfo?.id) {
+    // Fallback: userInfo fetched via access token on mobile
+    googleId = userInfo.id;
+    email = userInfo.email;
+    name = userInfo.name;
+    picture = userInfo.picture;
+  } else {
+    return res.status(400).json({ message: "Google credentials are required" });
+  }
 
   // Look for existing user by googleId or email
   let user = await User.findOne({ $or: [{ googleId }, { email: email.toLowerCase() }] });
