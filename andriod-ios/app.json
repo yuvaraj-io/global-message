@@ -21,7 +21,7 @@
       "edgeToEdgeEnabled": true,
       "softwareKeyboardLayoutMode": "resize",
       "predictiveBackGestureEnabled": false,
-      "package": "com.yuvaraj720.andriodios"
+      "package": "com.yuvaraj.globalspace"
     },
     "web": {
       "output": "static",
