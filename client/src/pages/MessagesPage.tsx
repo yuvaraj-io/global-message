@@ -323,7 +323,7 @@ export const MessagesPage = () => {
                                 style={
                                   mine
                                     ? {
-                                        borderLeft: "8px solid #d9fdd3",
+                                        borderLeft: "8px solid #E8E8E8",
                                         borderTop: "0",
                                         borderBottom: "8px solid transparent"
                                       }

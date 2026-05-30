@@ -5,21 +5,21 @@
 :root {
   color-scheme: light;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-  background: #f0f2f5;
-  color: #111b21;
+  background: #F5F5F5;
+  color: #0A0A0A;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: #f0f2f5;
-  color: #111b21;
+  background: #F5F5F5;
+  color: #0A0A0A;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #d1d7db transparent;
+  scrollbar-color: #d1d1d1 transparent;
 }
 
 *::-webkit-scrollbar {
@@ -28,12 +28,12 @@ body {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: #d1d7db;
+  background: #d1d1d1;
   border-radius: 999px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: #b9bfc3;
+  background: #b0b0b0;
 }
 
 @layer components {
@@ -55,8 +55,8 @@ body {
 }
 
 .chat-bg {
-  background-color: #efeae2;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><g fill='%23d9d2c5' fill-opacity='0.35'><circle cx='10' cy='10' r='1.2'/><circle cx='40' cy='30' r='1.2'/><circle cx='70' cy='10' r='1.2'/><circle cx='25' cy='55' r='1.2'/><circle cx='60' cy='65' r='1.2'/></g></svg>");
+  background-color: #F5F5F5;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><g fill='%23d5d5d5' fill-opacity='0.3'><circle cx='10' cy='10' r='1.2'/><circle cx='40' cy='30' r='1.2'/><circle cx='70' cy='10' r='1.2'/><circle cx='25' cy='55' r='1.2'/><circle cx='60' cy='65' r='1.2'/></g></svg>");
 }
 
 .bubble-tail-out::after {
@@ -66,7 +66,7 @@ body {
   top: 0;
   width: 0;
   height: 0;
-  border-left: 8px solid #d9fdd3;
+  border-left: 8px solid #E8E8E8;
   border-bottom: 8px solid transparent;
 }
 

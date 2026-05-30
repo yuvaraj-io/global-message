@@ -121,7 +121,7 @@ export const ProfilePage = () => {
   return (
     <div className="mx-auto max-w-3xl">
       <section className="panel overflow-hidden rounded-xl">
-        <div className="h-32 bg-[linear-gradient(120deg,#00a884,#25d366,#53bdeb)] opacity-90" />
+        <div className="h-32 bg-[#0A0A0A]" />
         <div className="px-5 pb-5">
           <div className="-mt-10 flex flex-wrap items-end justify-between gap-4">
             <UserAvatar user={profile.user} size="lg" />

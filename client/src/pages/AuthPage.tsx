@@ -1,16 +1,74 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { FiArrowRight, FiGlobe } from "react-icons/fi";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+
 export const AuthPage = ({ mode }: { mode: "login" | "register" }) => {
-  const { user, login, register } = useAuth();
+  const { user, login, register, googleLogin } = useAuth();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleGoogleResponse = useCallback(
+    async (response: { credential: string }) => {
+      setError("");
+      setLoading(true);
+      try {
+        await googleLogin(response.credential);
+        navigate("/");
+      } catch (nextError) {
+        setError(nextError instanceof Error ? nextError.message : "Google sign-in failed");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [googleLogin, navigate]
+  );
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID) return;
+
+    // Load Google Identity Services script
+    const existing = document.getElementById("google-gsi-script");
+    if (!existing) {
+      const script = document.createElement("script");
+      script.id = "google-gsi-script";
+      script.src = "https://accounts.google.com/gsi/client";
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+      script.onload = () => renderButton();
+    } else {
+      renderButton();
+    }
+
+    function renderButton() {
+      const google = (window as any).google;
+      if (!google?.accounts?.id) return;
+
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleResponse
+      });
+
+      const container = document.getElementById("google-signin-button");
+      if (container) {
+        container.innerHTML = "";
+        google.accounts.id.renderButton(container, {
+          theme: "outline",
+          size: "large",
+          width: "100%",
+          text: "continue_with",
+          shape: "pill"
+        });
+      }
+    }
+  }, [mode, handleGoogleResponse]);
 
   if (user) return <Navigate to="/" replace />;
 
@@ -85,6 +143,17 @@ export const AuthPage = ({ mode }: { mode: "login" | "register" }) => {
             </Link>
           )}
         </form>
+
+        {GOOGLE_CLIENT_ID && (
+          <>
+            <div className="my-4 flex items-center gap-3">
+              <div className="h-px flex-1 bg-wa-border" />
+              <span className="text-sm text-wa-muted">or</span>
+              <div className="h-px flex-1 bg-wa-border" />
+            </div>
+            <div id="google-signin-button" className="flex justify-center" />
+          </>
+        )}
 
         <p className="mt-5 text-center text-sm text-wa-subtext">
           {mode === "register" ? "Already have an account?" : "New around here?"}{" "}
