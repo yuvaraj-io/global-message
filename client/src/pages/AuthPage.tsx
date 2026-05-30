@@ -79,6 +79,11 @@ export const AuthPage = ({ mode }: { mode: "login" | "register" }) => {
             {mode === "register" ? "Register" : "Login"}
             <FiArrowRight />
           </button>
+          {mode === "login" && (
+            <Link to="/forgot-password" className="mt-3 block text-center text-sm text-wa-subtext hover:text-wa-text">
+              Forgot password?
+            </Link>
+          )}
         </form>
 
         <p className="mt-5 text-center text-sm text-wa-subtext">

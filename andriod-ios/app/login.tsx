@@ -42,6 +42,7 @@ export default function LoginScreen() {
           <Pressable style={[styles.button, loading && styles.disabled]} onPress={submit}>
             <Text style={styles.buttonText}>{loading ? "Logging in..." : "Login"}</Text>
           </Pressable>
+          <Link href="/forgot-password" style={styles.forgot}><Text style={styles.forgotText}>Forgot password?</Text></Link>
         </View>
         <Text style={styles.switchText}>New around here? <Link href="/register" style={styles.link}>Register</Link></Text>
       </KeyboardAvoidingView>
@@ -60,6 +61,8 @@ const styles = StyleSheet.create({
   button: { height: 50, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: colors.cyan },
   disabled: { opacity: 0.6 },
   buttonText: { color: "#fff", fontWeight: "900" },
+  forgot: { alignSelf: "center", marginTop: 2 },
+  forgotText: { color: colors.dim, fontWeight: "700", fontSize: 13 },
   switchText: { color: colors.dim, textAlign: "center", marginTop: 18 },
   link: { color: colors.cyan, fontWeight: "800" }
 });

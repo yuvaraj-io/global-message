@@ -11,7 +11,7 @@ type SocketContextValue = {
 const SocketContext = createContext<SocketContextValue | null>(null);
 
 export const SocketProvider = ({ children }: PropsWithChildren) => {
-  const { token } = useAuth();
+  const { token, forceLogout } = useAuth();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [online, setOnline] = useState<Record<string, boolean>>({});
 
@@ -22,13 +22,20 @@ export const SocketProvider = ({ children }: PropsWithChildren) => {
     }
     const nextSocket = io(API_URL, { auth: { token }, transports: ["websocket"] });
     setSocket(nextSocket);
+
     nextSocket.on("presence:update", ({ userId, online: isOnline }) => {
       setOnline((current) => ({ ...current, [userId]: isOnline }));
     });
+
+    // Single-device enforcement: server kicks this session when user logs in elsewhere
+    nextSocket.on("session:expired", () => {
+      forceLogout();
+    });
+
     return () => {
       nextSocket.disconnect();
     };
-  }, [token]);
+  }, [token, forceLogout]);
 
   const value = useMemo(() => ({ socket, online }), [online, socket]);
   return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>;

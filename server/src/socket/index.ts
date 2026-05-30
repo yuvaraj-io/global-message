@@ -1,7 +1,6 @@
 import { Server } from "socket.io";
 import { Server as HttpServer } from "http";
 import { env } from "../config/env.js";
-import { verifyToken } from "../utils/jwt.js";
 import { User } from "../models/User.js";
 import { Post } from "../models/Post.js";
 import { Reply } from "../models/Reply.js";
@@ -9,16 +8,34 @@ import { Message } from "../models/Message.js";
 import { serializeMessage, serializePost, serializeReply, serializeUser } from "../utils/serializers.js";
 
 const onlineUsers = new Map<string, string>();
+let ioInstance: Server | null = null;
+
+/** Force-disconnect a user's existing socket (called on new login) */
+export const forceDisconnect = (userId: string) => {
+  const socketId = onlineUsers.get(userId);
+  if (socketId && ioInstance) {
+    ioInstance.to(socketId).emit("session:expired");
+    const socket = ioInstance.sockets.sockets.get(socketId);
+    if (socket) socket.disconnect(true);
+    onlineUsers.delete(userId);
+  }
+};
 
 export const createSocketServer = (server: HttpServer) => {
   const io = new Server(server, {
     cors: { origin: env.clientUrl, credentials: true }
   });
+  ioInstance = io;
 
-  io.use((socket, next) => {
+  io.use(async (socket, next) => {
     try {
       const token = socket.handshake.auth.token as string;
-      socket.data.user = verifyToken(token);
+      if (!token) return next(new Error("Unauthorized"));
+
+      const user = await User.findOne({ sessionToken: token }).select("_id username");
+      if (!user) return next(new Error("Session expired"));
+
+      socket.data.user = { id: String(user._id), username: user.username };
       next();
     } catch {
       next(new Error("Unauthorized"));

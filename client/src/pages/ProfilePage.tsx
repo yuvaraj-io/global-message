@@ -25,6 +25,7 @@ export const ProfilePage = () => {
   const [editing, setEditing] = useState(false);
   const [bio, setBio] = useState("");
   const [avatar, setAvatar] = useState("");
+  const [newUsername, setNewUsername] = useState("");
   const [saving, setSaving] = useState(false);
   const { socket } = useSocket();
   const { user, updateUser } = useAuth();
@@ -36,6 +37,7 @@ export const ProfilePage = () => {
       setProfile(res.data);
       setBio(res.data.user.bio);
       setAvatar(res.data.user.avatar);
+      setNewUsername(res.data.user.username);
     });
   }, [username]);
 
@@ -82,7 +84,9 @@ export const ProfilePage = () => {
     event.preventDefault();
     setSaving(true);
     try {
-      const res = await api.patch("/users/me", { bio, avatar });
+      const body: Record<string, string> = { bio, avatar };
+      if (newUsername !== profile?.user.username) body.username = newUsername;
+      const res = await api.patch("/users/me", body);
       setProfile((current) => (current ? { ...current, user: res.data.user } : current));
       updateUser(res.data.user);
       setEditing(false);
@@ -148,6 +152,17 @@ export const ProfilePage = () => {
                   <input className="hidden" type="file" accept="image/*" onChange={selectAvatar} />
                 </label>
               </div>
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-wa-muted">Username</span>
+                <input
+                  className="input"
+                  value={newUsername}
+                  maxLength={24}
+                  onChange={(event) => setNewUsername(event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
+                  placeholder="username"
+                />
+                <span className="mt-1 block text-xs text-wa-muted">3-24 chars · lowercase, numbers, underscores · 30-day cooldown</span>
+              </label>
               <label className="block">
                 <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-wa-muted">Bio</span>
                 <textarea className="input min-h-24 resize-none" value={bio} maxLength={160} onChange={(event) => setBio(event.target.value)} />

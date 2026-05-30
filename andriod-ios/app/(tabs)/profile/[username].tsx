@@ -27,6 +27,7 @@ export default function ProfileScreen({ overrideUsername }: { overrideUsername?:
   const [editing, setEditing] = useState(false);
   const [bio, setBio] = useState("");
   const [avatar, setAvatar] = useState("");
+  const [newUsername, setNewUsername] = useState("");
 
   useEffect(() => {
     setProfile(null);
@@ -34,6 +35,7 @@ export default function ProfileScreen({ overrideUsername }: { overrideUsername?:
       setProfile(res);
       setBio(res.user.bio);
       setAvatar(res.user.avatar);
+      setNewUsername(res.user.username);
     });
   }, [username]);
 
@@ -50,7 +52,9 @@ export default function ProfileScreen({ overrideUsername }: { overrideUsername?:
 
   const saveProfile = async () => {
     try {
-      const res = await apiRequest<{ user: User }>("/users/me", { method: "PATCH", body: JSON.stringify({ bio, avatar }) });
+      const body: Record<string, string> = { bio, avatar };
+      if (newUsername !== profile?.user.username) body.username = newUsername;
+      const res = await apiRequest<{ user: User }>("/users/me", { method: "PATCH", body: JSON.stringify(body) });
       setProfile((current) => (current ? { ...current, user: res.user } : current));
       updateUser(res.user);
       setEditing(false);
@@ -91,6 +95,10 @@ export default function ProfileScreen({ overrideUsername }: { overrideUsername?:
             <View style={styles.editor}>
               <Image source={{ uri: avatar }} style={styles.preview} />
               <Pressable style={styles.ghostButton} onPress={pickAvatar}><Text style={styles.ghostText}>Upload photo</Text></Pressable>
+              <Text style={styles.fieldLabel}>Username</Text>
+              <TextInput style={styles.usernameInput} value={newUsername} onChangeText={(t) => setNewUsername(t.toLowerCase().replace(/[^a-z0-9_]/g, ""))} maxLength={24} autoCapitalize="none" placeholderTextColor={colors.dim} placeholder="username" />
+              <Text style={styles.fieldHint}>3-24 chars · lowercase, numbers, underscores · 30-day cooldown</Text>
+              <Text style={styles.fieldLabel}>Bio</Text>
               <TextInput style={styles.bioInput} value={bio} onChangeText={setBio} multiline maxLength={160} placeholderTextColor={colors.dim} />
               <Pressable style={styles.primaryButton} onPress={saveProfile}><Ionicons name="save-outline" color="#fff" size={17} /><Text style={styles.primaryText}>Save profile</Text></Pressable>
             </View>
@@ -141,6 +149,9 @@ const styles = StyleSheet.create({
   joined: { color: colors.dim, marginTop: 8, fontSize: 12 },
   editor: { marginTop: 14, gap: 10 },
   preview: { width: 82, height: 82, borderRadius: 41 },
+  fieldLabel: { color: colors.text, fontWeight: "800", fontSize: 13, marginTop: 4 },
+  fieldHint: { color: colors.dim, fontSize: 11, marginTop: -6 },
+  usernameInput: { height: 46, borderRadius: 12, paddingHorizontal: 14, color: colors.text, backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border },
   bioInput: { minHeight: 88, borderRadius: 12, padding: 12, color: colors.text, backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border, textAlignVertical: "top" },
   tabs: { flexDirection: "row", marginHorizontal: 16, marginBottom: 12, padding: 4, borderRadius: 14, backgroundColor: colors.panel, borderWidth: 1, borderColor: colors.border },
   tab: { flex: 1, paddingVertical: 9, alignItems: "center", borderRadius: 10 },

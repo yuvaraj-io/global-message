@@ -47,8 +47,30 @@ export const updateProfile = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Avatar must be an image upload or URL" });
   }
 
-  const update: { bio?: string; avatar?: string } = { bio };
+  const update: Record<string, any> = { bio };
   if (avatar) update.avatar = avatar;
+
+  // Username change
+  if (req.body.username !== undefined) {
+    const newUsername = String(req.body.username).trim().toLowerCase();
+    if (!/^[a-z0-9_]+$/.test(newUsername) || newUsername.length < 3 || newUsername.length > 24) {
+      return res.status(400).json({ message: "Username must be 3-24 characters (lowercase letters, numbers, underscores)." });
+    }
+    const taken = await User.findOne({ username: newUsername, _id: { $ne: req.user!.id } });
+    if (taken) return res.status(409).json({ message: "Username is already taken." });
+
+    // Optional 30-day cooldown
+    const current = await User.findById(req.user!.id).select("usernameChangedAt username");
+    if (current && current.username !== newUsername && current.usernameChangedAt) {
+      const daysSince = (Date.now() - new Date(current.usernameChangedAt).getTime()) / (1000 * 60 * 60 * 24);
+      if (daysSince < 30) {
+        return res.status(429).json({ message: `You can change your username again in ${Math.ceil(30 - daysSince)} days.` });
+      }
+    }
+
+    update.username = newUsername;
+    update.usernameChangedAt = new Date();
+  }
 
   const user = await User.findByIdAndUpdate(req.user!.id, update, { new: true, runValidators: true });
   if (!user) return res.status(404).json({ message: "User not found" });
