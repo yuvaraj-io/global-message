@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yuvaraj.globalspace"
     },
     "android": {
       "adaptiveIcon": {
@@ -50,7 +51,10 @@
       "router": {},
       "eas": {
         "projectId": "1decc82a-248c-4668-8dbe-5b3c57e61e4b"
-      }
+      },
+      "googleClientId": "569315023852-n4t0n0goe3ghj6s7sqj6tu6hafqr8m48.apps.googleusercontent.com",
+      "googleWebClientId": "569315023852-lrseul03f890sjlls0se2e51mtu4e8ks.apps.googleusercontent.com",
+      "googleIosClientId": "569315023852-d15n28d9lnrvimvqq6dbb4311o855l3e.apps.googleusercontent.com"
     }
   }
 }
