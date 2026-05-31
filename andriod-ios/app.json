@@ -5,10 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": [
-      "andriodios",
-      "com.googleusercontent.apps.569315023852-n4t0n0goe3ghj6s7sqj6tu6hafqr8m48"
-    ],
+    "scheme": "andriodios",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -44,7 +41,8 @@
             "backgroundColor": "#0A0A0A"
           }
         }
-      ]
+      ],
+      "@react-native-google-signin/google-signin"
     ],
     "experiments": {
       "typedRoutes": true,

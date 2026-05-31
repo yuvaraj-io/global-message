@@ -108,7 +108,7 @@ export const googleAuth = asyncHandler(async (req, res) => {
     // Verify ID token (web flow or when idToken is available)
     const ticket = await googleClient.verifyIdToken({
       idToken,
-      audience: [env.googleClientId, env.googleAndroidClientId].filter(Boolean)
+      audience: [env.googleClientId, env.googleAndroidClientId, env.googleWebClientId].filter(Boolean)
     });
     const payload = ticket.getPayload();
     if (!payload || !payload.email) return res.status(400).json({ message: "Invalid Google token" });

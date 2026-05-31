@@ -11,5 +11,6 @@ export const env = {
   emailFrom: process.env.EMAIL_FROM || "Global Space <noreply@discuss.yuvaraj.io>",
   googleClientId: process.env.GOOGLE_CLIENT_ID || "",
   googleAndroidClientId: process.env.GOOGLE_ANDROID_CLIENT_ID || "",
+  googleWebClientId: process.env.GOOGLE_WEB_CLIENT_ID || "",
   resetPasswordUrl: process.env.RESET_PASSWORD_URL || "http://localhost:5173/reset-password"
 };
