@@ -15,6 +15,7 @@ type AuthContextValue = {
   resetPassword: (email: string, token: string, password: string) => Promise<string>;
   updateUser: (user: User) => void;
   logout: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
   forceLogout: () => void;
 };
 
@@ -111,6 +112,10 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         } catch {
           // even if server call fails, clear local session
         }
+        await clearSession();
+      },
+      deleteAccount: async () => {
+        await apiRequest("/auth/account", { method: "DELETE" });
         await clearSession();
       },
       forceLogout

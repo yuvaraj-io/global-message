@@ -28,7 +28,7 @@ export const ProfilePage = () => {
   const [newUsername, setNewUsername] = useState("");
   const [saving, setSaving] = useState(false);
   const { socket } = useSocket();
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, deleteAccount } = useAuth();
   const { confirm, showSnackbar } = useUI();
 
   useEffect(() => {
@@ -95,6 +95,22 @@ export const ProfilePage = () => {
       showSnackbar(getErrorMessage(error), "error");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const accepted = await confirm({
+      title: "Delete account?",
+      message: "This permanently deletes your account, posts, replies, discussions, and messages. This cannot be undone.",
+      confirmLabel: "Delete account",
+      tone: "danger"
+    });
+    if (!accepted) return;
+    try {
+      await deleteAccount();
+      showSnackbar("Your account has been deleted.", "success");
+    } catch (error) {
+      showSnackbar(getErrorMessage(error), "error");
     }
   };
 
@@ -172,6 +188,18 @@ export const ProfilePage = () => {
                 <button className="button-primary" disabled={saving}>
                   <FiSave />
                   Save profile
+                </button>
+              </div>
+              <div className="mt-2 border-t border-wa-border pt-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-red-600">Danger zone</p>
+                <p className="mt-1 text-xs text-wa-muted">Permanently delete your account and all of your content. This cannot be undone.</p>
+                <button
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  className="mt-3 inline-flex items-center gap-2 rounded-lg border border-red-300 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                >
+                  <FiTrash2 />
+                  Delete account
                 </button>
               </div>
             </form>

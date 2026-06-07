@@ -13,6 +13,7 @@ type AuthContextValue = {
   resetPassword: (email: string, token: string, password: string) => Promise<string>;
   updateUser: (user: User) => void;
   logout: () => void;
+  deleteAccount: () => Promise<void>;
   forceLogout: () => void;
 };
 
@@ -107,6 +108,14 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
       updateUser: (nextUser) => setUser(nextUser),
       logout: () => {
         api.post("/auth/logout").catch(() => {});
+        clearSession();
+      },
+      deleteAccount: async () => {
+        try {
+          await api.delete("/auth/account");
+        } catch (error) {
+          throw new Error(getErrorMessage(error));
+        }
         clearSession();
       },
       forceLogout

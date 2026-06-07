@@ -1,5 +1,9 @@
 import { OAuth2Client } from "google-auth-library";
 import { env } from "../config/env.js";
+import { Discussion } from "../models/Discussion.js";
+import { Message } from "../models/Message.js";
+import { Post } from "../models/Post.js";
+import { Reply } from "../models/Reply.js";
 import { User } from "../models/User.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendResetEmail } from "../utils/email.js";
@@ -53,6 +57,27 @@ export const me = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user!.id);
   if (!user) return res.status(404).json({ message: "User not found" });
   res.json({ user: serializeUser(user) });
+});
+
+export const deleteAccount = asyncHandler(async (req, res) => {
+  const userId = req.user!.id;
+
+  // Remove all content created by the user, plus messages they sent or received.
+  await Promise.all([
+    Post.deleteMany({ userId }),
+    Reply.deleteMany({ userId }),
+    Discussion.deleteMany({ userId }),
+    Message.deleteMany({ $or: [{ senderId: userId }, { receiverId: userId }] }),
+    // Remove this user from everyone else's followers / following lists.
+    User.updateMany({ followers: userId }, { $pull: { followers: userId } }),
+    User.updateMany({ following: userId }, { $pull: { following: userId } })
+  ]);
+
+  // Disconnect any active socket session, then delete the account itself.
+  forceDisconnect(userId);
+  await User.findByIdAndDelete(userId);
+
+  res.json({ message: "Account deleted" });
 });
 
 export const forgotPassword = asyncHandler(async (req, res) => {

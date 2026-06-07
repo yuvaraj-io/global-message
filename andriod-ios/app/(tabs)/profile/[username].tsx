@@ -20,7 +20,7 @@ type ProfilePayload = { user: User; posts: Post[]; replies: Reply[]; discussions
 export default function ProfileScreen({ overrideUsername }: { overrideUsername?: string } = {}) {
   const params = useLocalSearchParams<{ username: string }>();
   const username = overrideUsername || params.username;
-  const { user, updateUser, logout } = useAuth();
+  const { user, updateUser, logout, deleteAccount } = useAuth();
   const { showSnackbar, confirm } = useUI();
   const [profile, setProfile] = useState<ProfilePayload | null>(null);
   const [tab, setTab] = useState<"posts" | "replies" | "discussions" | "media">("posts");
@@ -64,6 +64,22 @@ export default function ProfileScreen({ overrideUsername }: { overrideUsername?:
     }
   };
 
+  const handleDeleteAccount = async () => {
+    const accepted = await confirm({
+      title: "Delete account?",
+      message: "This permanently deletes your account, posts, replies, discussions, and messages. This cannot be undone.",
+      confirmLabel: "Delete account",
+      tone: "danger"
+    });
+    if (!accepted) return;
+    try {
+      await deleteAccount();
+      showSnackbar("Your account has been deleted.", "success");
+    } catch (error) {
+      showSnackbar(getErrorMessage(error), "error");
+    }
+  };
+
   const deleteReply = async (reply: Reply) => {
     const accepted = await confirm({ title: "Delete comment?", message: "This comment will be removed.", confirmLabel: "Delete comment", tone: "danger" });
     if (!accepted) return;
@@ -101,6 +117,7 @@ export default function ProfileScreen({ overrideUsername }: { overrideUsername?:
               <Text style={styles.fieldLabel}>Bio</Text>
               <TextInput style={styles.bioInput} value={bio} onChangeText={setBio} multiline maxLength={160} placeholderTextColor={colors.dim} />
               <Pressable style={styles.primaryButton} onPress={saveProfile}><Ionicons name="save-outline" color="#fff" size={17} /><Text style={styles.primaryText}>Save profile</Text></Pressable>
+              <Pressable style={styles.dangerButton} onPress={handleDeleteAccount}><Ionicons name="trash-outline" color={colors.rose} size={17} /><Text style={styles.dangerText}>Delete account</Text></Pressable>
             </View>
           ) : (
             <>
@@ -162,6 +179,8 @@ const styles = StyleSheet.create({
   replyMeta: { flexDirection: "row", justifyContent: "space-between" },
   replyText: { color: colors.text, marginTop: 8, lineHeight: 21 },
   delete: { color: colors.rose, fontWeight: "800" },
+  dangerButton: { flexDirection: "row", gap: 7, alignItems: "center", justifyContent: "center", paddingHorizontal: 14, paddingVertical: 11, borderRadius: 12, borderWidth: 1, borderColor: colors.rose },
+  dangerText: { color: colors.rose, fontWeight: "900" },
   discussionTitle: { color: colors.text, fontWeight: "900", fontSize: 16 },
   empty: { color: colors.dim, textAlign: "center", margin: 28 }
 });
