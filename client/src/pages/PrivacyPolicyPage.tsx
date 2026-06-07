@@ -84,7 +84,7 @@ export const PrivacyPolicyPage = () => (
             full deletion of your data, contact us at the email below.
           </p>
         </section>
-
+        
         <section>
           <h2 className="mb-2 text-lg font-bold">7. Children's Privacy</h2>
           <p>
