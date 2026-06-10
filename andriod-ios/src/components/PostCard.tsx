@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { useAuth } from "../context/AuthContext";
 import { useUI } from "../context/UIContext";
+import { useModeration } from "../hooks/useModeration";
 import { apiRequest, getErrorMessage } from "../services/api";
 import { Post } from "../types";
 import { timeAgo } from "../utils/time";
@@ -17,9 +18,27 @@ type Props = {
 
 export const PostCard = ({ post, onDelete }: Props) => {
   const { user } = useAuth();
-  const { confirm, showSnackbar } = useUI();
+  const { confirm, showSnackbar, chooseAction } = useUI();
+  const { report, block } = useModeration();
   const [deleting, setDeleting] = useState(false);
   const isOwner = user?.id === post.user.id;
+
+  const openMenu = () => {
+    chooseAction({
+      title: `@${post.user.username}`,
+      actions: [
+        {
+          label: "Report post",
+          onPress: () => report({ targetType: "post", targetId: post.id, targetUsername: post.user.username, label: "post" })
+        },
+        {
+          label: `Block @${post.user.username}`,
+          tone: "danger",
+          onPress: () => block(post.user.username, () => onDelete?.(post.id))
+        }
+      ]
+    });
+  };
 
   const deletePost = async () => {
     const accepted = await confirm({ title: "Delete post?", message: "This will remove the post and all replies.", confirmLabel: "Delete post", tone: "danger" });
@@ -47,9 +66,13 @@ export const PostCard = ({ post, onDelete }: Props) => {
               <Text style={styles.username}>@{post.user.username}</Text>
             </Pressable>
             <Text style={styles.time}>{timeAgo(post.createdAt)}</Text>
-            {isOwner && (
+            {isOwner ? (
               <Pressable style={styles.deleteButton} onPress={deletePost} disabled={deleting}>
                 {deleting ? <ActivityIndicator color={colors.rose} size={14} /> : <Ionicons name="trash-outline" color={colors.rose} size={15} />}
+              </Pressable>
+            ) : (
+              <Pressable style={styles.deleteButton} onPress={openMenu} hitSlop={8}>
+                <Ionicons name="ellipsis-horizontal" color={colors.dim} size={17} />
               </Pressable>
             )}
           </View>

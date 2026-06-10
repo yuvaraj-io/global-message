@@ -10,19 +10,22 @@ import { PostCard } from "@/src/components/PostCard";
 import { Screen } from "@/src/components/Screen";
 import { useAuth } from "@/src/context/AuthContext";
 import { useUI } from "@/src/context/UIContext";
+import { useModeration } from "@/src/hooks/useModeration";
 import { apiRequest, getErrorMessage } from "@/src/services/api";
 import { Discussion, Post, Reply, User } from "@/src/types";
 import { fullDate, timeAgo } from "@/src/utils/time";
 import { colors, shadow } from "@/src/utils/theme";
 
-type ProfilePayload = { user: User; posts: Post[]; replies: Reply[]; discussions: Discussion[] };
+type ProfilePayload = { user: User; posts: Post[]; replies: Reply[]; discussions: Discussion[]; isBlocked?: boolean };
 
 export default function ProfileScreen({ overrideUsername }: { overrideUsername?: string } = {}) {
   const params = useLocalSearchParams<{ username: string }>();
   const username = overrideUsername || params.username;
   const { user, updateUser, logout, deleteAccount } = useAuth();
-  const { showSnackbar, confirm } = useUI();
+  const { showSnackbar, confirm, chooseAction } = useUI();
+  const { report, block, unblock } = useModeration();
   const [profile, setProfile] = useState<ProfilePayload | null>(null);
+  const [blocked, setBlocked] = useState(false);
   const [tab, setTab] = useState<"posts" | "replies" | "discussions" | "media">("posts");
   const [editing, setEditing] = useState(false);
   const [bio, setBio] = useState("");
@@ -33,6 +36,7 @@ export default function ProfileScreen({ overrideUsername }: { overrideUsername?:
     setProfile(null);
     apiRequest<ProfilePayload>(`/users/${username}`).then((res) => {
       setProfile(res);
+      setBlocked(Boolean(res.isBlocked));
       setBio(res.user.bio);
       setAvatar(res.user.avatar);
       setNewUsername(res.user.username);
@@ -80,6 +84,22 @@ export default function ProfileScreen({ overrideUsername }: { overrideUsername?:
     }
   };
 
+  const openProfileMenu = () => {
+    if (!profile) return;
+    chooseAction({
+      title: `@${profile.user.username}`,
+      actions: [
+        {
+          label: "Report user",
+          onPress: () => report({ targetType: "user", targetId: profile.user.id, targetUsername: profile.user.username, label: "user" })
+        },
+        blocked
+          ? { label: "Unblock user", onPress: () => unblock(profile.user.username, setBlocked) }
+          : { label: "Block user", tone: "danger", onPress: () => block(profile.user.username, setBlocked) }
+      ]
+    });
+  };
+
   const deleteReply = async (reply: Reply) => {
     const accepted = await confirm({ title: "Delete comment?", message: "This comment will be removed.", confirmLabel: "Delete comment", tone: "danger" });
     if (!accepted) return;
@@ -103,7 +123,10 @@ export default function ProfileScreen({ overrideUsername }: { overrideUsername?:
                   <Pressable style={styles.ghostButton} onPress={logout}><Text style={styles.ghostText}>Logout</Text></Pressable>
                 </>
               ) : (
-                <Pressable style={styles.primaryButton} onPress={() => router.push(`/messages/${profile.user.username}` as never)}><Ionicons name="chatbubble-outline" color="#fff" size={17} /><Text style={styles.primaryText}>Message</Text></Pressable>
+                <>
+                  <Pressable style={styles.primaryButton} onPress={() => router.push(`/messages/${profile.user.username}` as never)}><Ionicons name="chatbubble-outline" color="#fff" size={17} /><Text style={styles.primaryText}>Message</Text></Pressable>
+                  <Pressable style={styles.iconButton} onPress={openProfileMenu}><Ionicons name="ellipsis-horizontal" color={colors.text} size={18} /></Pressable>
+                </>
               )}
             </View>
           </View>
@@ -126,6 +149,13 @@ export default function ProfileScreen({ overrideUsername }: { overrideUsername?:
             </>
           )}
         </View>
+        {!isMe && blocked && (
+          <View style={styles.blockedBanner}>
+            <Ionicons name="ban-outline" color={colors.rose} size={16} />
+            <Text style={styles.blockedText}>You have blocked this user.</Text>
+            <Pressable onPress={() => unblock(profile.user.username, setBlocked)}><Text style={styles.unblockText}>Unblock</Text></Pressable>
+          </View>
+        )}
         <View style={styles.tabs}>
           {(["posts", "replies", "discussions", "media"] as const).map((item) => (
             <Pressable key={item} style={[styles.tab, tab === item && styles.activeTab]} onPress={() => setTab(item)}>
@@ -160,6 +190,7 @@ const styles = StyleSheet.create({
   actions: { flexDirection: "row", gap: 8, alignItems: "flex-start", flexWrap: "wrap", justifyContent: "flex-end", flex: 1 },
   primaryButton: { flexDirection: "row", gap: 7, alignItems: "center", justifyContent: "center", paddingHorizontal: 14, paddingVertical: 11, borderRadius: 12, backgroundColor: colors.cyan },
   primaryText: { color: "#fff", fontWeight: "900" },
+  iconButton: { width: 44, height: 44, alignItems: "center", justifyContent: "center", borderRadius: 12, borderWidth: 1, borderColor: colors.border },
   ghostButton: { paddingHorizontal: 14, paddingVertical: 11, borderRadius: 12, borderWidth: 1, borderColor: colors.border },
   ghostText: { color: colors.text, fontWeight: "800" },
   bio: { color: colors.text, marginTop: 14, lineHeight: 21 },
@@ -182,5 +213,8 @@ const styles = StyleSheet.create({
   dangerButton: { flexDirection: "row", gap: 7, alignItems: "center", justifyContent: "center", paddingHorizontal: 14, paddingVertical: 11, borderRadius: 12, borderWidth: 1, borderColor: colors.rose },
   dangerText: { color: colors.rose, fontWeight: "900" },
   discussionTitle: { color: colors.text, fontWeight: "900", fontSize: 16 },
-  empty: { color: colors.dim, textAlign: "center", margin: 28 }
+  empty: { color: colors.dim, textAlign: "center", margin: 28 },
+  blockedBanner: { flexDirection: "row", alignItems: "center", gap: 8, marginHorizontal: 16, marginBottom: 12, padding: 12, borderRadius: 12, borderWidth: 1, borderColor: "rgba(244,63,94,0.4)", backgroundColor: "rgba(244,63,94,0.08)" },
+  blockedText: { color: colors.text, flex: 1, fontSize: 13 },
+  unblockText: { color: colors.rose, fontWeight: "800" }
 });

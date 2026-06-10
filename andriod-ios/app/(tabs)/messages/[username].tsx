@@ -8,6 +8,8 @@ import { Screen } from "@/src/components/Screen";
 import { useAuth } from "@/src/context/AuthContext";
 import { useNotifications } from "@/src/context/NotificationContext";
 import { useSocket } from "@/src/context/SocketContext";
+import { useUI } from "@/src/context/UIContext";
+import { useModeration } from "@/src/hooks/useModeration";
 import { apiRequest } from "@/src/services/api";
 import { Conversation, Message, User } from "@/src/types";
 import { timeAgo } from "@/src/utils/time";
@@ -17,6 +19,8 @@ export default function MessagesScreen() {
   const { username } = useLocalSearchParams<{ username?: string }>();
   const { user } = useAuth();
   const { socket, online } = useSocket();
+  const { chooseAction } = useUI();
+  const { report, block } = useModeration();
   const { unreadMessages, clearMessageUnread, setActiveMessageUser } = useNotifications();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [active, setActive] = useState<User | null>(null);
@@ -125,6 +129,29 @@ export default function MessagesScreen() {
     if (socket && active) socket.emit("message:typing", { receiverId: active.id, typing: Boolean(value) });
   };
 
+  const openChatMenu = () => {
+    if (!active) return;
+    chooseAction({
+      title: `@${active.username}`,
+      actions: [
+        {
+          label: "Report user",
+          onPress: () => report({ targetType: "user", targetId: active.id, targetUsername: active.username, label: "user" })
+        },
+        {
+          label: "Block user",
+          tone: "danger",
+          onPress: () =>
+            block(active.username, () => {
+              setActive(null);
+              setMessages([]);
+              router.replace("/messages" as never);
+            })
+        }
+      ]
+    });
+  };
+
   return (
     <Screen>
       <Header title="Messages" />
@@ -162,10 +189,13 @@ export default function MessagesScreen() {
               <Ionicons name="chevron-back" color={colors.text} size={24} />
             </Pressable>
             <Avatar user={active} online={online[active.id]} />
-            <View>
+            <View style={{ flex: 1 }}>
               <Text style={styles.username}>@{active.username}</Text>
               <Text style={styles.preview}>{online[active.id] ? "Online" : "Offline"}</Text>
             </View>
+            <Pressable onPress={openChatMenu} hitSlop={8}>
+              <Ionicons name="ellipsis-horizontal" color={colors.text} size={20} />
+            </Pressable>
           </View>
           <FlatList
             data={visibleMessages}

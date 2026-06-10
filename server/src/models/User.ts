@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema(
     bio: { type: String, default: "Exploring Global Space.", maxlength: 160 },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    blockedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     sessionToken: { type: String, select: false },
     resetToken: { type: String, select: false },
     resetExpires: { type: Date },

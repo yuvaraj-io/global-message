@@ -17,6 +17,9 @@ export const getProfile = asyncHandler(async (req, res) => {
   const user = await User.findOne({ username: String(req.params.username).toLowerCase() });
   if (!user) return res.status(404).json({ message: "Profile not found" });
 
+  const me = await User.findById(req.user!.id).select("blockedUsers");
+  const isBlocked = Boolean(me?.blockedUsers?.some((id) => String(id) === String(user._id)));
+
   const [posts, replies, discussions] = await Promise.all([
     Post.find({ userId: user._id }).sort({ createdAt: -1 }).limit(30).populate("userId"),
     Reply.find({ userId: user._id }).sort({ createdAt: -1 }).limit(30).populate("userId"),
@@ -25,6 +28,7 @@ export const getProfile = asyncHandler(async (req, res) => {
 
   res.json({
     user: serializeUser(user),
+    isBlocked,
     posts: posts.map(serializePost),
     replies: replies.map(serializeReply),
     discussions: discussions.map((discussion) => ({
@@ -76,4 +80,23 @@ export const updateProfile = asyncHandler(async (req, res) => {
   if (!user) return res.status(404).json({ message: "User not found" });
 
   res.json({ user: serializeUser(user) });
+});
+
+export const blockUser = asyncHandler(async (req, res) => {
+  const target = await User.findOne({ username: String(req.params.username).toLowerCase() });
+  if (!target) return res.status(404).json({ message: "User not found" });
+  if (String(target._id) === req.user!.id) {
+    return res.status(400).json({ message: "You cannot block yourself" });
+  }
+
+  await User.findByIdAndUpdate(req.user!.id, { $addToSet: { blockedUsers: target._id } });
+  res.json({ message: `You have blocked @${target.username}.`, blocked: true });
+});
+
+export const unblockUser = asyncHandler(async (req, res) => {
+  const target = await User.findOne({ username: String(req.params.username).toLowerCase() });
+  if (!target) return res.status(404).json({ message: "User not found" });
+
+  await User.findByIdAndUpdate(req.user!.id, { $pull: { blockedUsers: target._id } });
+  res.json({ message: `You have unblocked @${target.username}.`, blocked: false });
 });

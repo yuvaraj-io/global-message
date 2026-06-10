@@ -99,6 +99,14 @@ export const createSocketServer = (server: HttpServer) => {
 
     socket.on("message:send", async ({ receiverId, content, clientId }, ack) => {
       try {
+        const [sender, receiver] = await Promise.all([User.findById(user.id), User.findById(receiverId)]);
+        if (!receiver) return ack?.({ ok: false, message: "User not found" });
+
+        const iBlockedThem = (sender?.blockedUsers || []).some((id) => String(id) === String(receiverId));
+        const theyBlockedMe = (receiver?.blockedUsers || []).some((id) => String(id) === String(user.id));
+        if (iBlockedThem) return ack?.({ ok: false, message: "Unblock this user to send a message." });
+        if (theyBlockedMe) return ack?.({ ok: false, message: "You can't message this user." });
+
         const receiverOnline = onlineUsers.has(receiverId);
         const message = await Message.create({
           senderId: user.id,
@@ -106,7 +114,6 @@ export const createSocketServer = (server: HttpServer) => {
           content,
           delivered: receiverOnline
         });
-        const [sender, receiver] = await Promise.all([User.findById(user.id), User.findById(receiverId)]);
         const payload = {
           ...serializeMessage(message),
           clientId,

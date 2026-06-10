@@ -25,9 +25,13 @@ export const getConversations = asyncHandler(async (req, res) => {
     { $sort: { "latest.createdAt": -1 } }
   ]);
 
-  const users = await User.find({ _id: { $in: rows.map((row) => row._id) } });
+  const meDoc = await User.findById(req.user!.id).select("blockedUsers");
+  const blocked = new Set((meDoc?.blockedUsers || []).map((id) => String(id)));
+  const visibleRows = rows.filter((row) => !blocked.has(String(row._id)));
+
+  const users = await User.find({ _id: { $in: visibleRows.map((row) => row._id) } });
   res.json({
-    conversations: rows.map((row) => ({
+    conversations: visibleRows.map((row) => ({
       user: serializeUser(users.find((user) => String(user._id) === String(row._id))),
       latest: serializeMessage(row.latest),
       unread: row.unread

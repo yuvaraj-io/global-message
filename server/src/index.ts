@@ -10,6 +10,7 @@ import { authRoutes } from "./routes/authRoutes.js";
 import { postRoutes } from "./routes/postRoutes.js";
 import { userRoutes } from "./routes/userRoutes.js";
 import { messageRoutes } from "./routes/messageRoutes.js";
+import { reportRoutes } from "./routes/reportRoutes.js";
 
 import { errorHandler } from "./middlewares/error.js";
 import { createSocketServer } from "./socket/index.js";
@@ -52,6 +53,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/reports", reportRoutes);
 
 /**
  * Error Handler

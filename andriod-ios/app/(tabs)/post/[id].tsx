@@ -8,6 +8,7 @@ import { Screen } from "@/src/components/Screen";
 import { useAuth } from "@/src/context/AuthContext";
 import { useSocket } from "@/src/context/SocketContext";
 import { useUI } from "@/src/context/UIContext";
+import { useModeration } from "@/src/hooks/useModeration";
 import { apiRequest, getErrorMessage } from "@/src/services/api";
 import { Post, Reply } from "@/src/types";
 import { timeAgo } from "@/src/utils/time";
@@ -17,7 +18,8 @@ export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user } = useAuth();
   const { socket } = useSocket();
-  const { confirm, showSnackbar } = useUI();
+  const { confirm, showSnackbar, chooseAction } = useUI();
+  const { report, block } = useModeration();
   const [post, setPost] = useState<Post | null>(null);
   const [replies, setReplies] = useState<Reply[]>([]);
   const [reply, setReply] = useState("");
@@ -93,6 +95,27 @@ export default function PostDetailScreen() {
     }
   };
 
+  const openPostMenu = () => {
+    if (!post) return;
+    chooseAction({
+      title: `@${post.user.username}`,
+      actions: [
+        { label: "Report post", onPress: () => report({ targetType: "post", targetId: post.id, targetUsername: post.user.username, label: "post" }) },
+        { label: `Block @${post.user.username}`, tone: "danger", onPress: () => block(post.user.username, () => router.back()) }
+      ]
+    });
+  };
+
+  const openReplyMenu = (item: Reply) => {
+    chooseAction({
+      title: `@${item.user.username}`,
+      actions: [
+        { label: "Report comment", onPress: () => report({ targetType: "reply", targetId: item.id, targetUsername: item.user.username, label: "comment" }) },
+        { label: `Block @${item.user.username}`, tone: "danger", onPress: () => block(item.user.username, () => setReplies((current) => current.filter((r) => r.user.id !== item.user.id))) }
+      ]
+    });
+  };
+
   if (loading) return <Screen><LoadingState label="Loading post" /></Screen>;
   if (!post) return <Screen><Text style={styles.empty}>Post not found.</Text></Screen>;
 
@@ -128,9 +151,13 @@ export default function PostDetailScreen() {
                     <Text style={styles.time}>{timeAgo(post.createdAt)}</Text>
                   </View>
                 </View>
-                {isOwner && (
+                {isOwner ? (
                   <Pressable style={styles.deleteButton} onPress={deletePost}>
                     <Ionicons name="trash-outline" color={colors.rose} size={16} />
+                  </Pressable>
+                ) : (
+                  <Pressable style={styles.deleteButton} onPress={openPostMenu} hitSlop={8}>
+                    <Ionicons name="ellipsis-horizontal" color={colors.dim} size={18} />
                   </Pressable>
                 )}
               </View>
@@ -153,9 +180,13 @@ export default function PostDetailScreen() {
                 <View style={styles.metaRow}>
                   <Text style={styles.replyUser}>@{item.user.username}</Text>
                   <Text style={styles.time}>{timeAgo(item.createdAt)}</Text>
-                  {user?.id === item.user.id && (
+                  {user?.id === item.user.id ? (
                     <Pressable onPress={() => deleteReply(item.id)} style={styles.deleteButton}>
                       <Ionicons name="trash-outline" color={colors.rose} size={14} />
+                    </Pressable>
+                  ) : (
+                    <Pressable onPress={() => openReplyMenu(item)} style={styles.deleteButton} hitSlop={8}>
+                      <Ionicons name="ellipsis-horizontal" color={colors.dim} size={16} />
                     </Pressable>
                   )}
                 </View>

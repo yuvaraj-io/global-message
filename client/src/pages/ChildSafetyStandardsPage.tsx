@@ -54,11 +54,14 @@ export const ChildSafetyStandardsPage = () => (
         </section>
 
         <section>
-          <h2 className="mb-2 text-lg font-bold">3. Reporting Concerns</h2>
+          <h2 className="mb-2 text-lg font-bold">3. In-App Reporting and Blocking</h2>
           <p>
-            Users and members of the public can report child safety concerns, abusive content, or any other
-            violation by emailing us at the address below. We review all reports and act on credible reports of
-            CSAE without delay. Reported content and accounts may be removed while an investigation is carried out.
+            Users can report child safety concerns, abusive content, or any other violation directly from within
+            the app. A "Report" option is available on posts, comments, direct messages, and user profiles, and a
+            dedicated "Child safety" reason is provided. Users can also block any other user to immediately stop all
+            contact and hide their content. Concerns can additionally be reported by emailing us at the address
+            below. We review all reports and act on credible reports of CSAE without delay; reported content and
+            accounts may be removed while an investigation is carried out.
           </p>
         </section>
 
