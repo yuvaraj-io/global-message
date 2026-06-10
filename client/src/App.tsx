@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AppLayout } from "./layouts/AppLayout";
 import { ProtectedRoute } from "./layouts/ProtectedRoute";
 import { AuthPage } from "./pages/AuthPage";
+import { ChildSafetyStandardsPage } from "./pages/ChildSafetyStandardsPage";
 import { DeleteAccountPage } from "./pages/DeleteAccountPage";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
 import { HomePage } from "./pages/HomePage";
@@ -20,6 +21,7 @@ export const App = () => (
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/privacy" element={<PrivacyPolicyPage />} />
       <Route path="/delete-account" element={<DeleteAccountPage />} />
+      <Route path="/child-safety" element={<ChildSafetyStandardsPage />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route index element={<HomePage />} />
